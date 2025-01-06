@@ -1,2 +1,9 @@
 
 .codegpt
+node_modules/
+files/
+extracted/
+service-account.json
+package-lock.json
+.env
+.codegpt
