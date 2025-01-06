@@ -1,28 +1,53 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Subscriptions', {
+  async up(queryInterface, DataTypes) {
+    await queryInterface.createTable("Subscriptions", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
       },
-      name: {
-        type: Sequelize.STRING
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      hint: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      percentSaved: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      freeDays: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      originalPrice: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+      },
+      duration: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: DataTypes.DATE,
+      },
     });
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Subscriptions');
-  }
+  async down(queryInterface, DataTypes) {
+    await queryInterface.dropTable("Subscriptions");
+  },
 };

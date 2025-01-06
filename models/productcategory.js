@@ -13,12 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   ProductCategory.init(
     {
-      name: {
-        type: DataTypes.STRING,
+      productId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      image: {
-        type: DataTypes.STRING,
+      categoryId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
