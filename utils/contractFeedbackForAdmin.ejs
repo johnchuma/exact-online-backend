@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    span {
+      color: #6ebf4a;
+      text-decoration: underline;
+    }
+    @media (max-width: 500px) {
+      img {
+        height: 20px;
+      }
+      h1 {
+        font-size: 18px;
+      }
+    }
+  </style>
+  <body>
+    <div
+      style="
+        background-color: #f3f4f6;
+        padding: 20px;
+        color: #4b5563;
+        font-family: 'Inter', sans-serif;
+      "
+    >
+      <div class="container" style="background-color: white; padding: 20px">
+        <a href="https://www.kwanza.io" target="_blank">
+          <img
+            style="height: 35px"
+            src="https://api.kwanza.io/files/kwanza.png"
+          />
+        </a>
+
+        <div id="heading">
+          <h1 style="color: #222d38">Contract Submitted Successfully</h1>
+        </div>
+        <p style="font-size: 14px">Hello, Admin</p>
+        <p style="font-size: 14px">
+          The influencer (<%- influencer %>) has successfully signed the
+          contract. Feedback has been sent to the influencer, and they have been
+          provided with an option to download a copy of the signed contract
+        </p>
+
+        <button
+          style="
+            background-color: #6ebf4a;
+            padding: 12px 40px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            margin-top: 20px;
+          "
+        >
+          <a style="color: white; text-decoration: none" href="<%- pdfUrl %>"
+            >Download Contract</a
+          >
+        </button>
+      </div>
+      <div style="padding: 20px; font-size: 12px; color: #9ca3af">
+        <p>
+          This email was sent to <span><%- email %></span>. If you'd rather not
+          receive this kind of email, you can <span>unsubscribe</span> or
+          <span>manage your email preferences.</span>
+        </p>
+        <p>House No 346 Senga RD, Mikocheni, Dar es salaam</p>
+
+        <table
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          style="width: 100%; table-layout: fixed"
+        >
+          <tr>
+            <!-- Logo -->
+            <td style="text-align: left; vertical-align: middle; padding: 0">
+              <img
+                src="https://api.kwanza.io/files/k.png"
+                alt="Kwanza Logo"
+                style="height: 30px; display: block"
+              />
+            </td>
+
+            <!-- Social Icons -->
+            <td style="text-align: right; vertical-align: middle; padding: 0">
+              <a
+                href="https://x.com/kwanzanetwork?lang=en"
+                target="_blank"
+                style="text-decoration: none"
+              >
+                <img
+                  src="https://api.kwanza.io/files/twitter.png"
+                  alt="Twitter"
+                  style="height: 20px; display: inline-block; margin-left: 10px"
+                />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/kwanza-digital-network/?viewAsMember=true"
+                target="_blank"
+                style="text-decoration: none"
+              >
+                <img
+                  src="https://api.kwanza.io/files/linkedin.png"
+                  alt="LinkedIn"
+                  style="height: 20px; display: inline-block; margin-left: 10px"
+                />
+              </a>
+              <a
+                href="https://www.instagram.com/kwanzadesk/"
+                target="_blank"
+                style="text-decoration: none"
+              >
+                <img
+                  src="https://api.kwanza.io/files/insta.png"
+                  alt="Instagram"
+                  style="height: 20px; display: inline-block; margin-left: 10px"
+                />
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div></div>
+    </div>
+  </body>
+</html>
