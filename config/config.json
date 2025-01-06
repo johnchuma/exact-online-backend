@@ -1,23 +1,23 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "e_online",
-    "host": "127.0.0.1",
+    "username": "postgres",
+    "password": "ExactOnline@2025",
+    "database": "exact_online",
+    "host": "146.190.53.96",
     "dialect": "postgres"
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "e_online",
-    "host": "127.0.0.1",
+    "username": "postgres",
+    "password": "ExactOnline@2025",
+    "database": "exact_online",
+    "host": "146.190.53.96",
     "dialect": "postgres"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "e_online",
-    "host": "127.0.0.1",
+    "username": "postgres",
+    "password": "ExactOnline@2025",
+    "database": "exact_online",
+    "host": "146.190.53.96",
     "dialect": "postgres"
   }
 }
