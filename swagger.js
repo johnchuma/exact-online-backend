@@ -5,7 +5,7 @@ const doc = {
     title: "Exact Online API Docs",
     description: "These are API's for Exact Online system",
   },
-  host: "146.190.53.96:5000",
+  host: "https://api.exactonline.co.tz",
   schemes: ["http"],
   components: {
     securitySchemes: {
