@@ -46,6 +46,7 @@ const {
   shopViewsTag,
   subscriptionsTag,
   categoryProductSpecificationsTag,
+  adDimensionsTag,
 } = require("./utils/apiSwaggerTags");
 // const responseTime = require("express-response-time");
 // app.use(responseTime());
@@ -55,7 +56,7 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.text({ type: "text/plain" }));
 //routes
-app.use("/ad-dimensions", usersTag, AdDimensionsRoutes);
+app.use("/ad-dimensions", adDimensionsTag, AdDimensionsRoutes);
 app.use("/ads", adsTag, AdsRoutes);
 app.use("/categories", categoriesTag, CategoriesRoutes);
 app.use("/chats", chatsTag, ChatsRoutes);
