@@ -1,0 +1,94 @@
+const { Op } = require("sequelize");
+const { Category } = require("../../models");
+const { errorResponse, successResponse } = require("../../utils/responses");
+const { getUrl } = require("../../utils/get_url");
+
+const findCategoryByID = async (id) => {
+  try {
+    const category = await Category.findOne({
+      where: {
+        id,
+      },
+    });
+    return category;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+const addCategory = async (req, res) => {
+  try {
+    let { name } = req.body;
+    const image = await getUrl(req);
+    const response = await Category.create({
+      name,
+      image,
+    });
+    successResponse(res, response);
+  } catch (error) {
+    console.log(error);
+    errorResponse(res, error);
+  }
+};
+const getCategories = async (req, res) => {
+  try {
+    const response = await Category.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
+const getCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await findCategoryByID(id);
+    successResponse(res, category);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await findCategoryByID(id);
+    const response = await category.update({
+      ...req.body,
+    });
+    successResponse(res, response);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await findCategoryByID(id);
+    const response = await category.destroy();
+    successResponse(res, response);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
+module.exports = {
+  findCategoryByID,
+  getCategories,
+  addCategory,
+  deleteCategory,
+  addCategory,
+  getCategory,
+  updateCategory,
+};

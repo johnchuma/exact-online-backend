@@ -19,8 +19,8 @@ router.post("/auth/send-code", sendVerificationCode);
 router.post("/auth/verify-code", verifyCode);
 router.get("/", validateJWT, getPagination, getUsers);
 router.get("/me", validateJWT, getMyInfo);
-router.get("/:uuid", validateJWT, getUserInfo);
-router.patch("/:uuid", validateJWT, updateUser);
-router.delete("/:uuid", validateJWT, deleteUser);
+router.get("/:id", validateJWT, getUserInfo);
+router.patch("/:id", validateJWT, updateUser);
+router.delete("/:id", validateJWT, deleteUser);
 
 module.exports = router;

@@ -33,15 +33,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      categoryId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
+      
       isHidden: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       shopId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      categoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

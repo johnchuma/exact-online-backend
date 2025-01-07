@@ -1,0 +1,92 @@
+const { Op } = require("sequelize");
+const { Favorite } = require("../../models");
+const { errorResponse, successResponse } = require("../../utils/responses");
+
+const findFavoriteByID = async (id) => {
+  try {
+    const favorite = await Favorite.findOne({
+      where: {
+        id,
+      },
+    });
+    return favorite;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+const addFavorite = async (req, res) => {
+  try {
+    let { productId, userId } = req.body;
+    const response = await Favorite.create({
+      productId,
+      userId,
+    });
+    successResponse(res, response);
+  } catch (error) {
+    console.log(error);
+    errorResponse(res, error);
+  }
+};
+const getFavorites = async (req, res) => {
+  try {
+    const response = await Favorite.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        title: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
+const getFavorite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const favorite = await findFavoriteByID(id);
+    successResponse(res, favorite);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const updateFavorite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const favorite = await findFavoriteByID(id);
+    const response = await favorite.update({
+      ...req.body,
+    });
+    successResponse(res, response);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const deleteFavorite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const favorite = await findFavoriteByID(id);
+    const response = await favorite.destroy();
+    successResponse(res, response);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
+module.exports = {
+  findFavoriteByID,
+  getFavorites,
+  addFavorite,
+  deleteFavorite,
+  addFavorite,
+  getFavorite,
+  updateFavorite,
+};

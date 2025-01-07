@@ -4,11 +4,11 @@ const { generateJwtTokens } = require("../../utils/generateJwtTokens");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { randomNumber } = require("../../utils/random_number");
 
-const findUserByUUID = async (uuid) => {
+const findUserByID = async (id) => {
   try {
     const user = await User.findOne({
       where: {
-        uuid,
+        id,
       },
     });
     return user;
@@ -123,9 +123,6 @@ const getUsers = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      attributes: {
-        exclude: ["id"],
-      },
     });
     successResponse(res, {
       count: response.count,
@@ -139,8 +136,8 @@ const getUsers = async (req, res) => {
 
 const getUserInfo = async (req, res) => {
   try {
-    const { uuid } = req.params;
-    const user = await findUserByUUID(uuid);
+    const { id } = req.params;
+    const user = await findUserByID(id);
     successResponse(res, user);
   } catch (error) {
     errorResponse(res, error);
@@ -150,7 +147,7 @@ const getUserInfo = async (req, res) => {
 const getMyInfo = async (req, res) => {
   try {
     const user = req.user;
-    const response = await findUserByUUID(user.uuid);
+    const response = await findUserByID(user.id);
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
@@ -158,8 +155,8 @@ const getMyInfo = async (req, res) => {
 };
 const deleteUser = async (req, res) => {
   try {
-    const { uuid } = req.params;
-    const user = await findUserByUUID(uuid);
+    const { id } = req.params;
+    const user = await findUserByID(id);
     const response = await user.destroy();
     successResponse(res, response);
   } catch (error) {
@@ -169,8 +166,8 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { uuid } = req.params;
-    const user = await findUserByUUID(uuid);
+    const { id } = req.params;
+    const user = await findUserByID(id);
     const response = await user.update({
       ...req.body,
     });
@@ -180,7 +177,7 @@ const updateUser = async (req, res) => {
   }
 };
 module.exports = {
-  findUserByUUID,
+  findUserByID,
   getUsers,
   deleteUser,
   getUserInfo,
