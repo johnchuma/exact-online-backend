@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Order.hasManu(models.OrderedProduct);
+      Order.hasMany(models.OrderedProduct);
       // define association here
     }
   }
