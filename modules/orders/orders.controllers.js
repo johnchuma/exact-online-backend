@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Shop, User } = require("../../models");
+const { Shop, User, OrderedProduct } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getUserChats } = require("../chats/chats.controllers");
@@ -10,6 +10,7 @@ const findOrderByID = async (id) => {
       where: {
         id,
       },
+      include: [Shop, User, OrderedProduct],
     });
     return reel;
   } catch (error) {
