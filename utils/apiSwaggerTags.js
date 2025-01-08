@@ -83,11 +83,11 @@ const shopsTag = (req, res, next) => {
   next();
 };
 const ordersTag = (req, res, next) => {
-  // #swagger.tags = ['Shops']
+  // #swagger.tags = ['Orders']
   next();
 };
 const orderedProductsTag = (req, res, next) => {
-  // #swagger.tags = ['Shops']
+  // #swagger.tags = ['Ordered Products']
   next();
 };
 const shopsSubscriptionsTag = (req, res, next) => {
