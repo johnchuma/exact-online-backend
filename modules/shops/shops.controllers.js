@@ -1,5 +1,10 @@
 const { Op } = require("sequelize");
-const { Shop } = require("../../models");
+const {
+  Shop,
+  ShopCalender,
+  ShopSubscription,
+  ShopView,
+} = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -9,6 +14,7 @@ const findShopByID = async (id) => {
       where: {
         id,
       },
+      include: [ShopCalender, ShopSubscription, ShopView],
     });
     return shop;
   } catch (error) {

@@ -21,6 +21,18 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      Shop.hasMany(models.ShopCalender, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Shop.hasMany(models.ShopSubscription, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Shop.hasMany(models.ShopView, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
     }
   }
   Shop.init(

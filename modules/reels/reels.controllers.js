@@ -52,7 +52,29 @@ const getReels = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const getShopReels = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Reel.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        title: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+        shopId: id,
+      },
+      include: [Shop],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getReel = async (req, res) => {
   try {
     const { id } = req.params;
@@ -89,6 +111,7 @@ module.exports = {
   findReelByID,
   getReels,
   addReel,
+  getShopReels,
   deleteReel,
   addReel,
   getReel,
