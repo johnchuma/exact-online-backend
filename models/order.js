@@ -9,12 +9,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Order.hasMany(models.OrderedProduct);
+      Order.belongsTo(models.User);
+      Order.belongsTo(models.Shop);
       // define association here
     }
   }
   Order.init(
     {
       userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      shopId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

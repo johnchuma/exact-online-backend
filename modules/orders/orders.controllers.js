@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const { Shop, User } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const { getUserChats } = require("../chats/chats.controllers");
 
 const findOrderByID = async (id) => {
   try {
@@ -18,9 +19,10 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    let { userId } = req.body;
+    let { userId, shopId } = req.body;
     const response = await Order.create({
       userId,
+      shopId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -33,12 +35,7 @@ const getOrders = async (req, res) => {
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        title: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
-      include: [Shop],
+      include: [User, Shop],
     });
     successResponse(res, {
       count: response.count,
@@ -49,7 +46,39 @@ const getOrders = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const getUserOrders = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Order.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        userId: id,
+      },
+      include: [Shop],
+    });
+  } catch (e) {}
+};
+const getShopOrders = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Order.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        shopId: id,
+      },
+      include: [User],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,6 +116,8 @@ module.exports = {
   getOrders,
   addOrder,
   deleteOrder,
+  getShopOrders,
+  getUserOrders,
   addOrder,
   getOrder,
   updateOrder,

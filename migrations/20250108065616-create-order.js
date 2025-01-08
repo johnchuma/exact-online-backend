@@ -13,6 +13,10 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      shopId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       status: {
         type: DataTypes.STRING,
         defaultValue: "Pending",
