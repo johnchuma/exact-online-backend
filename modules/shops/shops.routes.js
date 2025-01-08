@@ -6,6 +6,7 @@ const {
   deleteShop,
   addShop,
   getShop,
+  getUserShops,
 } = require("./shops.controllers");
 const { getPagination } = require("../../utils/getPagination");
 const upload = require("../../utils/upload");
@@ -14,6 +15,7 @@ const router = Router();
 
 router.post("/", validateJWT, addShop);
 router.get("/", validateJWT, getPagination, getShops);
+router.get("/user/:id", validateJWT, getPagination, getUserShops);
 router.get("/:id", validateJWT, getShop);
 router.patch("/:id", validateJWT, updateShop);
 router.delete("/:id", validateJWT, deleteShop);

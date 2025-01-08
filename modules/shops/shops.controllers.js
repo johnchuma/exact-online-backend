@@ -54,6 +54,29 @@ const getShops = async (req, res) => {
   }
 };
 
+const getUserShops = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Shop.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+        userId: id,
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
 const getShop = async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,6 +86,7 @@ const getShop = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const updateShop = async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,6 +99,7 @@ const updateShop = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const deleteShop = async (req, res) => {
   try {
     const { id } = req.params;
@@ -93,5 +118,6 @@ module.exports = {
   deleteShop,
   addShop,
   getShop,
+  getUserShops,
   updateShop,
 };
