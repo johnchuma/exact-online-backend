@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { ProductCategory } = require("../../models");
+const { ProductCategory, Category } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -29,16 +29,12 @@ const addProductCategory = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const getCategories = async (req, res) => {
+const getProductCategories = async (req, res) => {
   try {
     const response = await ProductCategory.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
+      include: [Category],
     });
     successResponse(res, {
       count: response.count,
@@ -84,7 +80,7 @@ const deleteProductCategory = async (req, res) => {
 
 module.exports = {
   findProductCategoryByID,
-  getCategories,
+  getProductCategories,
   addProductCategory,
   deleteProductCategory,
   addProductCategory,

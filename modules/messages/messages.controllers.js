@@ -33,13 +33,35 @@ const addMessage = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const getChatMessages = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Message.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        message: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+        chatId: id,
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getMessages = async (req, res) => {
   try {
     const response = await Message.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
-        title: {
+        message: {
           [Op.like]: `%${req.keyword}%`,
         },
       },
@@ -53,7 +75,6 @@ const getMessages = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
 const getMessage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -91,6 +112,7 @@ module.exports = {
   getMessages,
   addMessage,
   deleteMessage,
+  getChatMessages,
   addMessage,
   getMessage,
   updateMessage,

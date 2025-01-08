@@ -8,9 +8,10 @@ const {
   getReel,
 } = require("./reels.controllers");
 const { getPagination } = require("../../utils/getPagination");
+const upload = require("../../utils/upload");
 const router = Router();
 
-router.post("/", validateJWT, addReel);
+router.post("/", upload.single("file"), validateJWT, addReel);
 router.get("/", validateJWT, getPagination, getReels);
 router.get("/:id", validateJWT, getReel);
 router.patch("/:id", validateJWT, updateReel);

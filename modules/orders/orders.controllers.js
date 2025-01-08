@@ -1,11 +1,11 @@
 const { Op } = require("sequelize");
-const { Reel, User } = require("../../models");
+const { Shop, User } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
-const findReelByID = async (id) => {
+const findOrderByID = async (id) => {
   try {
-    const reel = await Reel.findOne({
+    const reel = await Order.findOne({
       where: {
         id,
       },
@@ -16,14 +16,11 @@ const findReelByID = async (id) => {
     throw error;
   }
 };
-const addReel = async (req, res) => {
+const addOrder = async (req, res) => {
   try {
-    let { caption, shopId } = req.body;
-    const videoUrl = await getUrl(req);
-    const response = await Reel.create({
-      videoUrl,
-      caption,
-      shopId,
+    let { userId } = req.body;
+    const response = await Order.create({
+      userId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -31,9 +28,9 @@ const addReel = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const getReels = async (req, res) => {
+const getOrders = async (req, res) => {
   try {
-    const response = await Reel.findAndCountAll({
+    const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
@@ -53,19 +50,19 @@ const getReels = async (req, res) => {
   }
 };
 
-const getReel = async (req, res) => {
+const getOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await findOrderByID(id);
     successResponse(res, reel);
   } catch (error) {
     errorResponse(res, error);
   }
 };
-const updateReel = async (req, res) => {
+const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await findOrderByID(id);
     const response = await reel.update({
       ...req.body,
     });
@@ -74,10 +71,10 @@ const updateReel = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const deleteReel = async (req, res) => {
+const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await findOrderByID(id);
     const response = await reel.destroy();
     successResponse(res, response);
   } catch (error) {
@@ -86,11 +83,11 @@ const deleteReel = async (req, res) => {
 };
 
 module.exports = {
-  findReelByID,
-  getReels,
-  addReel,
-  deleteReel,
-  addReel,
-  getReel,
-  updateReel,
+  findOrderByID,
+  getOrders,
+  addOrder,
+  deleteOrder,
+  addOrder,
+  getOrder,
+  updateOrder,
 };

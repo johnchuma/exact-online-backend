@@ -9,6 +9,30 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Product.hasMany(models.PromotedProduct, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Product.hasMany(models.ProductReview, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Product.hasMany(models.ProductStat, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Product.hasMany(models.ProductImage, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Product.hasMany(models.ProductColor, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Product.hasMany(models.ProductCategory, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
     }
   }
   Product.init(
@@ -33,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      
+
       isHidden: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

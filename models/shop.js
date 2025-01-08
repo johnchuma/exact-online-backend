@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Shop.hasMany(models.Reel, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Shop.hasMany(models.Product, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
     }
   }
   Shop.init(

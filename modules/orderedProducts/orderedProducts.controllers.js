@@ -1,11 +1,11 @@
 const { Op } = require("sequelize");
-const { Reel, User } = require("../../models");
+const { OrderedProduct, User } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
-const findReelByID = async (id) => {
+const findOrderedProductByID = async (id) => {
   try {
-    const reel = await Reel.findOne({
+    const reel = await OrderedProduct.findOne({
       where: {
         id,
       },
@@ -16,14 +16,12 @@ const findReelByID = async (id) => {
     throw error;
   }
 };
-const addReel = async (req, res) => {
+const addOrderedProduct = async (req, res) => {
   try {
-    let { caption, shopId } = req.body;
-    const videoUrl = await getUrl(req);
-    const response = await Reel.create({
-      videoUrl,
-      caption,
-      shopId,
+    let { orderId, productId } = req.body;
+    const response = await OrderedProduct.create({
+      orderId,
+      productId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -31,9 +29,9 @@ const addReel = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const getReels = async (req, res) => {
+const getOrderedProducts = async (req, res) => {
   try {
-    const response = await Reel.findAndCountAll({
+    const response = await OrderedProduct.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
@@ -53,19 +51,19 @@ const getReels = async (req, res) => {
   }
 };
 
-const getReel = async (req, res) => {
+const getOrderedProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await findOrderedProductByID(id);
     successResponse(res, reel);
   } catch (error) {
     errorResponse(res, error);
   }
 };
-const updateReel = async (req, res) => {
+const updateOrderedProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await findOrderedProductByID(id);
     const response = await reel.update({
       ...req.body,
     });
@@ -74,10 +72,10 @@ const updateReel = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const deleteReel = async (req, res) => {
+const deleteOrderedProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await findOrderedProductByID(id);
     const response = await reel.destroy();
     successResponse(res, response);
   } catch (error) {
@@ -86,11 +84,11 @@ const deleteReel = async (req, res) => {
 };
 
 module.exports = {
-  findReelByID,
-  getReels,
-  addReel,
-  deleteReel,
-  addReel,
-  getReel,
-  updateReel,
+  findOrderedProductByID,
+  getOrderedProducts,
+  addOrderedProduct,
+  deleteOrderedProduct,
+  addOrderedProduct,
+  getOrderedProduct,
+  updateOrderedProduct,
 };

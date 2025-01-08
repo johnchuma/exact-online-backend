@@ -23,6 +23,8 @@ const ShopsSubscriptionsRoutes = require("./modules/shopSubscriptions/shopSubscr
 const ShopViewRoutes = require("./modules/shopViews/shopViews.routes");
 const SubscriptionRoutes = require("./modules/subscriptions/subscriptions.routes");
 const UserRoutes = require("./modules/users/users.routes");
+const OrdersRoutes = require("./modules/orders/orders.routes");
+const OrderedProductsRoutes = require("./modules/orderedProducts/orderedProducts.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
 const {
@@ -47,6 +49,8 @@ const {
   subscriptionsTag,
   categoryProductSpecificationsTag,
   adDimensionsTag,
+  ordersTag,
+  orderedProductsTag,
 } = require("./utils/apiSwaggerTags");
 // const responseTime = require("express-response-time");
 // app.use(responseTime());
@@ -72,6 +76,8 @@ app.use("/reels", reelsTag, ReelsRoutes);
 app.use("/shop-calenders", shopCalendersTag, ShopCalendersRoutes);
 app.use("/shop-documents", shopDocumentsTag, ShopDocumentsRoutes);
 app.use("/shops", shopsTag, ShopsRoutes);
+app.use("/orders", ordersTag, OrdersRoutes);
+app.use("/ordered-products", orderedProductsTag, OrderedProductsRoutes);
 app.use(
   "/shops-subscriptions",
   shopsSubscriptionsTag,

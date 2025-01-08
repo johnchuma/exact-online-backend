@@ -1,5 +1,10 @@
 const { Op } = require("sequelize");
-const { Product } = require("../../models");
+const {
+  Product,
+  ProductImage,
+  ProductStat,
+  ProductReview,
+} = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -58,6 +63,7 @@ const getProducts = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
+      include: [ProductImage, ProductStat, ProductReview],
     });
     successResponse(res, {
       count: response.count,
@@ -68,7 +74,29 @@ const getProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const getShopProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Product.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+        shopId: id,
+      },
+      include: [ProductImage, ProductStat, ProductReview],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -106,6 +134,7 @@ module.exports = {
   getProducts,
   addProduct,
   deleteProduct,
+  getShopProducts,
   addProduct,
   getProduct,
   updateProduct,

@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      ProductCategory.belongsTo(models.Category);
+      ProductCategory.belongsTo(models.Product);
     }
   }
   ProductCategory.init(

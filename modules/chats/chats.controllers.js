@@ -33,10 +33,24 @@ const getChats = async (req, res) => {
     const response = await Chat.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const getUserChats = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Chat.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
       where: {
-        title: {
-          [Op.like]: `%${req.keyword}%`,
-        },
+        userId: id,
       },
     });
     successResponse(res, {
@@ -48,7 +62,25 @@ const getChats = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const getShopChats = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const response = await Chat.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        shopId: id,
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getChat = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,6 +117,8 @@ module.exports = {
   findChatByID,
   getChats,
   addChat,
+  getUserChats,
+  getShopChats,
   deleteChat,
   addChat,
   getChat,

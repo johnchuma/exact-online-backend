@@ -34,6 +34,30 @@ const addAd = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
+const getShopAds = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Ad.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        title: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+        shopId,
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
 const getAds = async (req, res) => {
   try {
     const response = await Ad.findAndCountAll({
@@ -92,6 +116,7 @@ module.exports = {
   getAds,
   addAd,
   deleteAd,
+  getShopAds,
   addAd,
   getAd,
   updateAd,

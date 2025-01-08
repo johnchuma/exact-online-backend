@@ -1,32 +1,32 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class AdDimension extends Model {
+  class Order extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      Order.hasManu(models.OrderedProduct);
       // define association here
-      AdDimension.hasMany(models.Ad);
     }
   }
-  AdDimension.init(
+  Order.init(
     {
-      width: {
-        type: DataTypes.DOUBLE,
+      userId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      height: {
-        type: DataTypes.DOUBLE,
-        allowNull: false,
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "Pending",
       },
     },
     {
       sequelize,
-      modelName: "AdDimension",
+      modelName: "Order",
     }
   );
-  return AdDimension;
+  return Order;
 };
