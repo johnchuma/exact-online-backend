@@ -10,12 +10,14 @@ const {
   verifyCode,
   sendVerificationCode,
   login,
+  addAdmin,
 } = require("./users.controllers");
 const { getPagination } = require("../../utils/getPagination");
 
 const router = Router();
 
 router.post("/", addUser);
+router.post("/admin", addAdmin);
 router.post("/auth/send-code", sendVerificationCode);
 router.post("/auth/verify-code", verifyCode);
 router.post("/auth/login", login);

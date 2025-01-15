@@ -4,6 +4,7 @@ const { generateJwtTokens } = require("../../utils/generateJwtTokens");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { randomNumber } = require("../../utils/random_number");
 const bcrypt = require("bcrypt");
+const { response } = require("express");
 const findUserByID = async (id) => {
   try {
     const user = await User.findOne({
@@ -27,16 +28,19 @@ const checkIfUserExists = async (phone) => {
 };
 const addAdmin = async (req, res) => {
   try {
-    let { name, email, password } = req.body;
+    let { name, email, phone, password } = req.body;
     password = bcrypt.hashSync(password, 10);
     const response = await User.create({
       name,
       email,
       password,
+      phone,
       role: "admin",
     });
     successResponse(res, response);
-  } catch (error) {}
+  } catch (error) {
+    errorResponse(res, error);
+  }
 };
 const addUser = async (req, res) => {
   try {
@@ -103,9 +107,9 @@ const login = async (req, res) => {
       },
     });
     if (user) {
-      if (await bcrypt.compare(user.password, password)) {
+      if (await bcrypt.compare(password, user.password)) {
         const token = generateJwtTokens(user);
-        successResponse(res, { access_token: token });
+        successResponse(res, token);
       } else {
         res.status(401).send({
           status: false,
@@ -138,11 +142,7 @@ const verifyCode = async (req, res) => {
     if (user) {
       if (user.passcode == passcode) {
         const token = generateJwtTokens(user);
-        successResponse(res, {
-          status: true,
-          message: "Logged in successfully",
-          token,
-        });
+        successResponse(res, token);
         await User.update({
           passcode: null,
         });
@@ -231,6 +231,7 @@ module.exports = {
   findUserByID,
   getUsers,
   deleteUser,
+  addAdmin,
   getUserInfo,
   checkIfUserExists,
   addUser,
