@@ -3,7 +3,7 @@ const { User } = require("../../models");
 const { generateJwtTokens } = require("../../utils/generateJwtTokens");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { randomNumber } = require("../../utils/random_number");
-
+const bcrypt = require("bcrypt");
 const findUserByID = async (id) => {
   try {
     const user = await User.findOne({
@@ -65,6 +65,43 @@ const sendVerificationCode = async (req, res) => {
         passcode: code,
       });
 
+      successResponse(res, {
+        status: true,
+        message: "Verification code is sent to your phone number",
+      });
+    } else {
+      res.status(403).send({
+        status: false,
+        message: "User does not exist",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    errorResponse(res, error);
+  }
+};
+const login = async (req, res) => {
+  try {
+    let { email, password } = req.body;
+    let user = await User.findOne({
+      where: {
+        email,
+      },
+    });
+    if (user) {
+      if (await bcrypt.compare(user.password, password)) {
+        const token = generateJwtTokens(user);
+        successResponse(res, { access_token: token });
+      } else {
+        res.status(401).send({
+          status: false,
+          message: "Incorrect password",
+        });
+      }
+      //send verfication code sms
+      user = await User.update({
+        passcode: code,
+      });
       successResponse(res, {
         status: true,
         message: "Verification code is sent to your phone number",
@@ -183,6 +220,7 @@ module.exports = {
   getUserInfo,
   checkIfUserExists,
   addUser,
+  login,
   verifyCode,
   sendVerificationCode,
   getMyInfo,
