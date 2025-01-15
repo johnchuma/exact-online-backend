@@ -79,7 +79,7 @@ const sendVerificationCode = async (req, res) => {
       let code = randomNumber();
       code = 123456;
       //send verfication code sms
-      user = await User.update({
+      user = await user.update({
         passcode: code,
       });
 
@@ -116,14 +116,6 @@ const login = async (req, res) => {
           message: "Incorrect password",
         });
       }
-      //send verfication code sms
-      user = await User.update({
-        passcode: code,
-      });
-      successResponse(res, {
-        status: true,
-        message: "Verification code is sent to your phone number",
-      });
     } else {
       res.status(403).send({
         status: false,
@@ -143,7 +135,7 @@ const verifyCode = async (req, res) => {
       if (user.passcode == passcode) {
         const token = generateJwtTokens(user);
         successResponse(res, token);
-        await User.update({
+        await user.update({
           passcode: null,
         });
       } else {
