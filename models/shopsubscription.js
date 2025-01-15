@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   ShopSubscription.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       shopId: {
         type: DataTypes.INTEGER,
         allowNull: false,

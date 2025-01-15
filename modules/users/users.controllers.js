@@ -25,9 +25,23 @@ const checkIfUserExists = async (phone) => {
   });
   return user;
 };
+const addAdmin = async (req, res) => {
+  try {
+    let { name, email, password } = req.body;
+    password = bcrypt.hashSync(password, 10);
+    const response = await User.create({
+      name,
+      email,
+      password,
+      role: "admin",
+    });
+    successResponse(res, response);
+  } catch (error) {}
+};
 const addUser = async (req, res) => {
   try {
-    let { name, phone } = req.body;
+    let { name, phone, email, role, password } = req.body;
+
     let user = await checkIfUserExists(phone);
     if (user) {
       res.status(403).send({

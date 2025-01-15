@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   ProductStat.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       productId: {
         type: DataTypes.INTEGER,
         allowNull: false,

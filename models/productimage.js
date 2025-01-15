@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   ProductImage.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       image: {
         type: DataTypes.STRING,
         allowNull: false,

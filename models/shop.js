@@ -37,6 +37,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Shop.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       registeredBy: {
         type: DataTypes.STRING,
         defaultValue: "Business",

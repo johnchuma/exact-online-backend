@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Reel.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       videoUrl: {
         type: DataTypes.STRING,
         allowNull: false,

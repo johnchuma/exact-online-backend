@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   CategoryProductSpecification.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       label: {
         type: DataTypes.STRING,
         allowNull: false,

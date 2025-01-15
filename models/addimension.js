@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   AdDimension.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       width: {
         type: DataTypes.DOUBLE,
         allowNull: false,

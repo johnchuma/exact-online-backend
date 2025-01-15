@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Chat.init(
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
