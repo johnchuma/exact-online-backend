@@ -13,6 +13,7 @@ const {
   addAdmin,
 } = require("./users.controllers");
 const { getPagination } = require("../../utils/getPagination");
+const upload = require("../../utils/upload");
 
 const router = Router();
 
@@ -24,7 +25,7 @@ router.post("/auth/login", login);
 router.get("/", validateJWT, getPagination, getUsers);
 router.get("/me", validateJWT, getMyInfo);
 router.get("/:id", validateJWT, getUserInfo);
-router.patch("/:id", validateJWT, updateUser);
+router.patch("/:id", upload.single("file"), validateJWT, updateUser);
 router.delete("/:id", validateJWT, deleteUser);
 
 module.exports = router;

@@ -5,6 +5,7 @@ const { errorResponse, successResponse } = require("../../utils/responses");
 const { randomNumber } = require("../../utils/random_number");
 const bcrypt = require("bcrypt");
 const { response } = require("express");
+const { getUrl } = require("../../utils/get_url");
 const findUserByID = async (id) => {
   try {
     const user = await User.findOne({
@@ -176,7 +177,26 @@ const getUsers = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const getSellers = async (req, res) => {
+  try {
+    const response = await User.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+      },
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
@@ -210,12 +230,19 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
+
     const user = await findUserByID(id);
+
+    let url = await getUrl(req);
+    if (url) {
+      req.body.image = url;
+    }
     const response = await user.update({
       ...req.body,
     });
     successResponse(res, response);
   } catch (error) {
+    console.log("Error here");
     errorResponse(res, error);
   }
 };

@@ -2,7 +2,10 @@ const path = require("path");
 
 const getUrl = async (req) => {
   const file = req.file;
-  return `http://192.168.1.182:5000/files/${file.originalname}`;
+  if (file) {
+    return `https://api.exactonline.co.tz/files/${file.originalname}`;
+  }
+  return null;
 };
 
 module.exports = { getUrl };
