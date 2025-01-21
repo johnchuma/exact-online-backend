@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      Shop.belongsTo(models.User);
     }
   }
   Shop.init(
@@ -63,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      userId: {
+      UserId: {
         type: DataTypes.UUID,
         allowNull: false,
       },

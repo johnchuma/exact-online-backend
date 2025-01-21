@@ -1,10 +1,9 @@
 const { Op, Sequelize } = require("sequelize");
-const { User } = require("../../models");
+const { User, Shop } = require("../../models");
 const { generateJwtTokens } = require("../../utils/generateJwtTokens");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { randomNumber } = require("../../utils/random_number");
 const bcrypt = require("bcrypt");
-const { response } = require("express");
 const { getUrl } = require("../../utils/get_url");
 const findUserByID = async (id) => {
   try {
@@ -12,6 +11,7 @@ const findUserByID = async (id) => {
       where: {
         id,
       },
+      include: [Shop],
     });
     return user;
   } catch (error) {
@@ -167,6 +167,7 @@ const getUsers = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
+      include: [Shop],
     });
     successResponse(res, {
       count: response.count,
@@ -234,7 +235,7 @@ const updateUser = async (req, res) => {
     const user = await findUserByID(id);
 
     let url = await getUrl(req);
-    console.log(url,req.body)
+    console.log(url, req.body);
     if (url) {
       req.body.image = url;
     }

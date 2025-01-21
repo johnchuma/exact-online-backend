@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      User.hasMany(models.Shop, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
     }
   }
   User.init(

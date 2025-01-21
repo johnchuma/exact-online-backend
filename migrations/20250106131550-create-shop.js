@@ -29,7 +29,7 @@ module.exports = {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      userId: {
+      UserId: {
         type: DataTypes.UUID,
         allowNull: false,
       },
