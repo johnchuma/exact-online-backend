@@ -33,6 +33,10 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      isApproved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

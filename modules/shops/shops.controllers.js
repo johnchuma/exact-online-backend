@@ -3,6 +3,7 @@ const {
   Shop,
   ShopCalender,
   ShopSubscription,
+  ShopDocument,
   ShopView,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
@@ -50,6 +51,7 @@ const getShops = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
+      include: [ShopDocument],
     });
     successResponse(res, {
       count: response.count,

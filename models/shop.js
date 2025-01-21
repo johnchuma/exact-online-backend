@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      Shop.hasMany(models.ShopDocument, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
       Shop.hasMany(models.ShopView, {
         onDelete: "CASCADE",
         scope: true,
@@ -67,6 +71,10 @@ module.exports = (sequelize, DataTypes) => {
       UserId: {
         type: DataTypes.UUID,
         allowNull: false,
+      },
+      isApproved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

@@ -17,7 +17,7 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      shopId: {
+      ShopId: {
         type: DataTypes.UUID,
         allowNull: false,
       },
