@@ -234,6 +234,7 @@ const updateUser = async (req, res) => {
     const user = await findUserByID(id);
 
     let url = await getUrl(req);
+    console.log(url,req.body)
     if (url) {
       req.body.image = url;
     }

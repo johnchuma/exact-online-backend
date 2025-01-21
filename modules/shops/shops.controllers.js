@@ -25,6 +25,7 @@ const findShopByID = async (id) => {
 const addShop = async (req, res) => {
   try {
     let { registeredBy, name, phone, address, description, userId } = req.body;
+    console.log(req.body)
     const response = await Shop.create({
       registeredBy,
       name,

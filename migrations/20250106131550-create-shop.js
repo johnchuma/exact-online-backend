@@ -30,7 +30,7 @@ module.exports = {
         allowNull: false,
       },
       userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
       },
       createdAt: {
