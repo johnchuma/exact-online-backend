@@ -9,8 +9,8 @@ module.exports = {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       openTime: {

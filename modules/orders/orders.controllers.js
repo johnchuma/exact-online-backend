@@ -20,10 +20,10 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    let { userId, shopId } = req.body;
+    let { UserId, ShopId } = req.body;
     const response = await Order.create({
-      userId,
-      shopId,
+      UserId,
+      ShopId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -54,7 +54,7 @@ const getUserOrders = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        userId: id,
+        UserId: id,
       },
       include: [Shop],
     });
@@ -67,7 +67,7 @@ const getShopOrders = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        shopId: id,
+        ShopId: id,
       },
       include: [User],
     });

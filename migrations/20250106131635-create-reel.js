@@ -17,8 +17,8 @@ module.exports = {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       views: {

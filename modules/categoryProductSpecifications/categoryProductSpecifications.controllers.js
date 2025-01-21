@@ -18,11 +18,11 @@ const findCategoryProductSpecificationByID = async (id) => {
 };
 const addCategoryProductSpecification = async (req, res) => {
   try {
-    let { label, expectedDataType, categoryId } = req.body;
+    let { label, expectedDataType, CategoryId } = req.body;
     const response = await CategoryProductSpecification.create({
       label,
       expectedDataType,
-      categoryId,
+      CategoryId,
     });
     successResponse(res, response);
   } catch (error) {

@@ -18,10 +18,10 @@ const findProductImageByID = async (id) => {
 };
 const addProductImage = async (req, res) => {
   try {
-    let { productId } = req.body;
+    let { ProductId } = req.body;
     const image = await getUrl(req);
     const response = await ProductImage.create({
-      productId,
+      ProductId,
       image,
     });
     successResponse(res, response);

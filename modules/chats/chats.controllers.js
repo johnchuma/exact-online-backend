@@ -17,10 +17,10 @@ const findChatByID = async (id) => {
 };
 const addChat = async (req, res) => {
   try {
-    let { shopId, userId } = req.body;
+    let { ShopId, UserId } = req.body;
     const response = await Chat.create({
-      shopId,
-      userId,
+      ShopId,
+      UserId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -50,7 +50,7 @@ const getUserChats = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        userId: id,
+        UserId: id,
       },
     });
     successResponse(res, {
@@ -69,7 +69,7 @@ const getShopChats = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        shopId: id,
+        ShopId: id,
       },
     });
     successResponse(res, {

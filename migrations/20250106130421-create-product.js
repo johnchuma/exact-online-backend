@@ -29,16 +29,16 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      categoryId: {
-        type: DataTypes.INTEGER,
+      CategoryId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       isHidden: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       specifications: {

@@ -17,10 +17,10 @@ const findFavoriteByID = async (id) => {
 };
 const addFavorite = async (req, res) => {
   try {
-    let { productId, userId } = req.body;
+    let { ProductId, UserId } = req.body;
     const response = await Favorite.create({
-      productId,
-      userId,
+      ProductId,
+      UserId,
     });
     successResponse(res, response);
   } catch (error) {

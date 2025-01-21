@@ -17,16 +17,16 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      chatId: {
-        type: DataTypes.INTEGER,
+      ChatId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
-      userId: {
-        type: DataTypes.INTEGER,
+      UserId: {
+        type: DataTypes.UUID,
         allowNull: true,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: true,
       },
       createdAt: {

@@ -17,10 +17,10 @@ const findShopViewByID = async (id) => {
 };
 const addShopView = async (req, res) => {
   try {
-    let { shopId, userId } = req.body;
+    let { ShopId, UserId } = req.body;
     const response = await ShopView.create({
-      shopId,
-      userId,
+      ShopId,
+      UserId,
     });
     successResponse(res, response);
   } catch (error) {

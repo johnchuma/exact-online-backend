@@ -18,10 +18,10 @@ const findProductStatByID = async (id) => {
 };
 const addProductStat = async (req, res) => {
   try {
-    let { productId, userId, type } = req.body;
+    let { ProductId, UserId, type } = req.body;
     const response = await ProductStat.create({
-      productId,
-      userId,
+      ProductId,
+      UserId,
       type,
     });
     successResponse(res, response);

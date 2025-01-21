@@ -18,10 +18,10 @@ const findShopSubscriptionByID = async (id) => {
 };
 const addShopSubscription = async (req, res) => {
   try {
-    let { subscriptionId, shopId } = req.body;
+    let { SubscriptionId, ShopId } = req.body;
     const response = await ShopSubscription.create({
-      shopId,
-      subscriptionId,
+      ShopId,
+      SubscriptionId,
     });
     successResponse(res, response);
   } catch (error) {

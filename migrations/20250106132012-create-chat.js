@@ -9,12 +9,12 @@ module.exports = {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      userId: {
-        type: DataTypes.INTEGER,
+      UserId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       createdAt: {

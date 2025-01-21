@@ -18,13 +18,13 @@ const findAdByID = async (id) => {
 };
 const addAd = async (req, res) => {
   try {
-    let { adDimensionId, budget, shopId, startDate, endDate } = req.body;
+    let { AdDimensionId, budget, ShopId, startDate, endDate } = req.body;
     const image = await getUrl(req);
     const response = await Ad.create({
       image,
-      adDimensionId,
+      AdDimensionId,
       budget,
-      shopId,
+      ShopId,
       startDate,
       endDate,
     });
@@ -45,7 +45,7 @@ const getShopAds = async (req, res) => {
         title: {
           [Op.like]: `%${req.keyword}%`,
         },
-        shopId,
+        ShopId,
       },
     });
     successResponse(res, {

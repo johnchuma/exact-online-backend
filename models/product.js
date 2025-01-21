@@ -68,12 +68,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
-      categoryId: {
-        type: DataTypes.INTEGER,
+      CategoryId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       specifications: {

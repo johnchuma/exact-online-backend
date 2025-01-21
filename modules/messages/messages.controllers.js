@@ -18,12 +18,12 @@ const findMessageByID = async (id) => {
 };
 const addMessage = async (req, res) => {
   try {
-    let { chatId, userId, shopId, message } = req.body;
+    let { ChatId, UserId, ShopId, message } = req.body;
     const image = await getUrl(req);
     const response = await Message.create({
-      chatId,
-      userId,
-      shopId,
+      ChatId,
+      UserId,
+      ShopId,
       message,
       image,
     });
@@ -43,7 +43,7 @@ const getChatMessages = async (req, res) => {
         message: {
           [Op.like]: `%${req.keyword}%`,
         },
-        chatId: id,
+        ChatId: id,
       },
     });
     successResponse(res, {

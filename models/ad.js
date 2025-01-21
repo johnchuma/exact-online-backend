@@ -24,16 +24,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      adDimensionId: {
-        type: DataTypes.INTEGER,
+      AdDimensionId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       budget: {
         type: DataTypes.DOUBLE,
         allowNull: false,
       },
-      shopId: {
-        type: DataTypes.INTEGER,
+      ShopId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       startDate: {

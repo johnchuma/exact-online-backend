@@ -27,8 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: "string",
       },
-      categoryId: {
-        type: DataTypes.INTEGER,
+      CategoryId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
     },

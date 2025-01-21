@@ -18,12 +18,12 @@ const findReelByID = async (id) => {
 };
 const addReel = async (req, res) => {
   try {
-    let { caption, shopId } = req.body;
+    let { caption, ShopId } = req.body;
     const videoUrl = await getUrl(req);
     const response = await Reel.create({
       videoUrl,
       caption,
-      shopId,
+      ShopId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -62,7 +62,7 @@ const getShopReels = async (req, res) => {
         title: {
           [Op.like]: `%${req.keyword}%`,
         },
-        shopId: id,
+        ShopId: id,
       },
       include: [Shop],
     });

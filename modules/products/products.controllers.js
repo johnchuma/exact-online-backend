@@ -32,8 +32,8 @@ const addProduct = async (req, res) => {
       isHidden,
       specifications,
       description,
-      categoryId,
-      shopId,
+      CategoryId,
+      ShopId,
     } = req.body;
     const response = await Product.create({
       name,
@@ -44,8 +44,8 @@ const addProduct = async (req, res) => {
       isHidden,
       specifications,
       description,
-      categoryId,
-      shopId,
+      CategoryId,
+      ShopId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -84,7 +84,7 @@ const getShopProducts = async (req, res) => {
         name: {
           [Op.like]: `%${req.keyword}%`,
         },
-        shopId: id,
+        ShopId: id,
       },
       include: [ProductImage, ProductStat, ProductReview],
     });

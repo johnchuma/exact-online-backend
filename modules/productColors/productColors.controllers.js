@@ -18,9 +18,9 @@ const findProductColorByID = async (id) => {
 };
 const addProductColor = async (req, res) => {
   try {
-    let { productId, color } = req.body;
+    let { ProductId, color } = req.body;
     const response = await ProductColor.create({
-      productId,
+      ProductId,
       color,
     });
     successResponse(res, response);

@@ -18,10 +18,10 @@ const findOrderedProductByID = async (id) => {
 };
 const addOrderedProduct = async (req, res) => {
   try {
-    let { orderId, productId } = req.body;
+    let { OrderId, ProductId } = req.body;
     const response = await OrderedProduct.create({
-      orderId,
-      productId,
+      OrderId,
+      ProductId,
     });
     successResponse(res, response);
   } catch (error) {

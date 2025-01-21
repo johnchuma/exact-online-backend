@@ -18,9 +18,9 @@ const findPromotedProductByID = async (id) => {
 };
 const addPromotedProduct = async (req, res) => {
   try {
-    let { productId, budget, startDate, endDate } = req.body;
+    let { ProductId, budget, startDate, endDate } = req.body;
     const response = await PromotedProduct.create({
-      productId,
+      ProductId,
       budget,
       startDate,
       endDate,

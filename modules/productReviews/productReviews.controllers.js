@@ -18,10 +18,10 @@ const findProductReviewByID = async (id) => {
 };
 const addProductReview = async (req, res) => {
   try {
-    let { productId, userId, rating, description } = req.body;
+    let { ProductId, UserId, rating, description } = req.body;
     const response = await ProductReview.create({
-      productId,
-      userId,
+      ProductId,
+      UserId,
       rating,
       description,
     });

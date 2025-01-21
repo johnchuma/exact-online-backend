@@ -25,7 +25,7 @@ const findShopByID = async (id) => {
 };
 const addShop = async (req, res) => {
   try {
-    let { registeredBy, name, phone, address, description, userId } = req.body;
+    let { registeredBy, name, phone, address, description, UserId } = req.body;
     console.log(req.body);
     const response = await Shop.create({
       registeredBy,
@@ -33,7 +33,7 @@ const addShop = async (req, res) => {
       phone,
       address,
       description,
-      UserId: userId,
+      UserId: UserId,
     });
     successResponse(res, response);
   } catch (error) {
@@ -73,7 +73,7 @@ const getUserShops = async (req, res) => {
         name: {
           [Op.like]: `%${req.keyword}%`,
         },
-        userId: id,
+        UserId: id,
       },
     });
     successResponse(res, {

@@ -13,8 +13,8 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      userId: {
-        type: DataTypes.INTEGER,
+      UserId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       createdAt: {

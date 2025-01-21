@@ -18,12 +18,12 @@ const findShopDocumentByID = async (id) => {
 };
 const addShopDocument = async (req, res) => {
   try {
-    let { title,shopId } = req.body;
+    let { title, ShopId } = req.body;
     const url = await getUrl(req);
     const response = await ShopDocument.create({
       title,
       url,
-      ShopId:shopId
+      ShopId: ShopId,
     });
     successResponse(res, response);
   } catch (error) {

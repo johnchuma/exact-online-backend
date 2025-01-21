@@ -18,10 +18,10 @@ const findProductCategoryByID = async (id) => {
 };
 const addProductCategory = async (req, res) => {
   try {
-    let { productId, categoryId } = req.body;
+    let { ProductId, CategoryId } = req.body;
     const response = await ProductCategory.create({
-      productId,
-      categoryId,
+      ProductId,
+      CategoryId,
     });
     successResponse(res, response);
   } catch (error) {
