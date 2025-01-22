@@ -32,13 +32,15 @@ const addCategoryProductSpecification = async (req, res) => {
 };
 const getCategoryProductSpecifications = async (req, res) => {
   try {
+    const {id} = req.params
     const response = await CategoryProductSpecification.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
-        title: {
+        label: {
           [Op.like]: `%${req.keyword}%`,
         },
+        CategoryId:id
       },
     });
     successResponse(res, {

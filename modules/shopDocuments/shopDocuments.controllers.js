@@ -20,10 +20,11 @@ const addShopDocument = async (req, res) => {
   try {
     let { title, ShopId } = req.body;
     const url = await getUrl(req);
+    console.log(req.body)
     const response = await ShopDocument.create({
       title,
       url,
-      ShopId: ShopId,
+      ShopId,
     });
     successResponse(res, response);
   } catch (error) {
