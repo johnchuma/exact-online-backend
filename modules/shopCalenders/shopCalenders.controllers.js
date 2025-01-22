@@ -18,10 +18,11 @@ const findShopCalenderByID = async (id) => {
 };
 const addShopCalender = async (req, res) => {
   try {
-    let { ShopId, openTime, closeTime, isOpen } = req.body;
+    let { ShopId, day, openTime, closeTime, isOpen } = req.body;
     const response = await ShopCalender.create({
       ShopId,
       openTime,
+      day,
       closeTime,
       isOpen,
     });

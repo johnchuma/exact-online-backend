@@ -13,6 +13,10 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      day: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       openTime: {
         type: DataTypes.DATE,
         allowNull: true,
