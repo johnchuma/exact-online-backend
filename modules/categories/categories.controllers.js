@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Category } = require("../../models");
+const { Category,CategoryProductSpecification } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -40,6 +40,7 @@ const getCategories = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
+      include:[CategoryProductSpecification]
     });
     successResponse(res, {
       count: response.count,
