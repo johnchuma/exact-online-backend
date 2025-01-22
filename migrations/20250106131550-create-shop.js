@@ -31,7 +31,7 @@ module.exports = {
       },
       shopLat: {
         type: DataTypes.DOUBLE,
-        allowNull: false,
+        allowNull: true,
       },
       description: {
         type: DataTypes.TEXT,
