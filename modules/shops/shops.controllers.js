@@ -100,6 +100,7 @@ const getShop = async (req, res) => {
 const updateShop = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id, req.body);
     const shop = await findShopByID(id);
     const response = await shop.update({
       ...req.body,

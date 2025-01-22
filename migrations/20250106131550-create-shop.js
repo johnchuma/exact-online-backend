@@ -25,6 +25,14 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      shopLong: {
+        type: DataTypes.DOUBLE,
+        allowNull: true,
+      },
+      shopLat: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+      },
       description: {
         type: DataTypes.TEXT,
         allowNull: false,
