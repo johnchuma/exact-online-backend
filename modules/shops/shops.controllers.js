@@ -52,6 +52,7 @@ const getShops = async (req, res) => {
         },
       },
       include: [ShopDocument],
+      
     });
     successResponse(res, {
       count: response.count,
