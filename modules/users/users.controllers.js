@@ -57,9 +57,13 @@ const addUser = async (req, res) => {
       let code = randomNumber();
       code = 123456;
       //send verfication code sms
+      password = bcrypt.hashSync(password, 10);
       user = await User.create({
         name,
         phone,
+        email,
+        role,
+        password,
         passcode: code,
       });
       successResponse(res, {
