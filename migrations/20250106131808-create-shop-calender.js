@@ -18,11 +18,11 @@ module.exports = {
         allowNull: false,
       },
       openTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         allowNull: true,
       },
       closeTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         allowNull: true,
       },
       isOpen: {

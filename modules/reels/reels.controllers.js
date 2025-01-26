@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Reel, User } = require("../../models");
+const { Reel, User,Shop } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -37,7 +37,7 @@ const getReels = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        title: {
+        caption: {
           [Op.like]: `%${req.keyword}%`,
         },
       },
@@ -55,17 +55,18 @@ const getReels = async (req, res) => {
 const getShopReels = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id)
     const response = await Reel.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
-        title: {
+        caption: {
           [Op.like]: `%${req.keyword}%`,
         },
-        ShopId: id,
       },
       include: [Shop],
     });
+    console.log
     successResponse(res, {
       count: response.count,
       page: req.page,

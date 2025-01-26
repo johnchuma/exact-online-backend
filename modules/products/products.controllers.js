@@ -7,6 +7,7 @@ const {
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const moment = require("moment");
 
 const findProductByID = async (id) => {
   try {
@@ -54,6 +55,53 @@ const addProduct = async (req, res) => {
   }
 };
 const getProducts = async (req, res) => {
+  try {
+    const {category} = req.query;
+    let filter  = {
+      name: {
+        [Op.like]: `%${req.keyword}%`,
+      },
+    };
+    if(category && category != "All"){
+       filter.CategoryId = category
+    }
+    const response = await Product.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: filter,
+      include: [ProductImage, ProductStat, ProductReview],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const getNewArrivalProducts = async (req, res) => {
+  try {
+    const response = await Product.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+      },
+      include: [ProductImage, ProductStat, ProductReview],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const getProductsForYou = async (req, res) => {
   try {
     const response = await Product.findAndCountAll({
       limit: req.limit,
@@ -135,6 +183,8 @@ module.exports = {
   addProduct,
   deleteProduct,
   getShopProducts,
+  getNewArrivalProducts,
+  getProductsForYou,
   addProduct,
   getProduct,
   updateProduct,

@@ -69,7 +69,7 @@ app.use("/product-categories", productCategoriesTag, ProductCategoriesRoutes);
 app.use("/product-colors", productColorsTag, ProductColorsRoutes);
 app.use("/product-images", productImagesTag, ProductImagesRoutes);
 app.use("/product-reviews", productReviewsTag, ProductReviewsRoutes);
-app.use("/product-routes", productsTag, ProductsRoutes);
+app.use("/products", productsTag, ProductsRoutes);
 app.use("/product-stats", productStatsTag, ProductStatsRoutes);
 app.use("/promoted-products", promotedProductsTag, PromotedProductsRoutes);
 app.use("/reels", reelsTag, ReelsRoutes);
