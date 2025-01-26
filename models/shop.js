@@ -37,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      Shop.hasMany(models.ShopFollower, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
       Shop.belongsTo(models.User);
     }
   }

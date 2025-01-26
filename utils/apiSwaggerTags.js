@@ -77,7 +77,10 @@ const shopDocumentsTag = (req, res, next) => {
   // #swagger.tags = ['Shop Documents']
   next();
 };
-
+const shopFollowersTag = (req, res, next) => {
+  // #swagger.tags = ['Shop Followers']
+  next();
+};
 const shopsTag = (req, res, next) => {
   // #swagger.tags = ['Shops']
   next();
@@ -130,6 +133,7 @@ module.exports = {
   shopsTag,
   shopsSubscriptionsTag,
   shopViewsTag,
+  shopFollowersTag,
   subscriptionsTag,
   categoryProductSpecificationsTag,
   ordersTag,

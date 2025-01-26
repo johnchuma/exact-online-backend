@@ -23,6 +23,7 @@ const ShopsSubscriptionsRoutes = require("./modules/shopSubscriptions/shopSubscr
 const ShopViewRoutes = require("./modules/shopViews/shopViews.routes");
 const SubscriptionRoutes = require("./modules/subscriptions/subscriptions.routes");
 const UserRoutes = require("./modules/users/users.routes");
+const ShopFollowersRoutes = require("./modules/shopFollowers/shopFollowers.routes");
 const OrdersRoutes = require("./modules/orders/orders.routes");
 const OrderedProductsRoutes = require("./modules/orderedProducts/orderedProducts.routes");
 const swaggerUi = require("swagger-ui-express");
@@ -75,6 +76,7 @@ app.use("/promoted-products", promotedProductsTag, PromotedProductsRoutes);
 app.use("/reels", reelsTag, ReelsRoutes);
 app.use("/shop-calenders", shopCalendersTag, ShopCalendersRoutes);
 app.use("/shop-documents", shopDocumentsTag, ShopDocumentsRoutes);
+app.use("/shop-followers", shopDocumentsTag, ShopFollowersRoutes);
 app.use("/shops", shopsTag, ShopsRoutes);
 app.use("/orders", ordersTag, OrdersRoutes);
 app.use("/ordered-products", orderedProductsTag, OrderedProductsRoutes);
