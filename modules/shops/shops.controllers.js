@@ -5,6 +5,7 @@ const {
   ShopSubscription,
   ShopDocument,
   ShopView,
+  ShopFollower,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
@@ -15,7 +16,7 @@ const findShopByID = async (id) => {
       where: {
         id,
       },
-      include: [ShopCalender, ShopSubscription, ShopView],
+      include: [ShopCalender, ShopSubscription, ShopView, ShopFollower],
     });
     return shop;
   } catch (error) {
@@ -51,8 +52,7 @@ const getShops = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [ShopDocument],
-      
+      include: [ShopDocument, ShopFollower],
     });
     successResponse(res, {
       count: response.count,
