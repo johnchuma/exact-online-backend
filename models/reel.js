@@ -28,6 +28,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      duration: {
+        type: DataTypes.TIME,
+        allowNull: true,
+      },
+      thumbnail: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       ShopId: {
         type: DataTypes.UUID,
         allowNull: false,

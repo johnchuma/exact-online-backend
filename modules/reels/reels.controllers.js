@@ -1,7 +1,8 @@
 const { Op } = require("sequelize");
-const { Reel, User,Shop } = require("../../models");
+const { Reel, User, Shop } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const { getVideoMetadata } = require("../../utils/get_video_metadata");
 
 const findReelByID = async (id) => {
   try {
@@ -20,9 +21,13 @@ const addReel = async (req, res) => {
   try {
     let { caption, ShopId } = req.body;
     const videoUrl = await getUrl(req);
+    const metadata = await getVideoMetadata(req);
+    console.log(metadata);
     const response = await Reel.create({
       videoUrl,
       caption,
+      duration: metadata.duration,
+      thumbnail: metadata.thumbnail,
       ShopId,
     });
     successResponse(res, response);
@@ -55,7 +60,7 @@ const getReels = async (req, res) => {
 const getShopReels = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
     const response = await Reel.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -66,7 +71,7 @@ const getShopReels = async (req, res) => {
       },
       include: [Shop],
     });
-    console.log
+    console.log;
     successResponse(res, {
       count: response.count,
       page: req.page,
