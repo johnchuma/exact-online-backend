@@ -14,13 +14,13 @@ const formatDuration = (seconds) => {
 
 const getVideoMetadata = async (req) => {
   const videoPath = req.file.path;
-  const thumbnailPath = `thumbnails/${
+  const thumbnailPath = `files/${
     req.file.originalname.split(".")[0]
   }-thumbnail.png`;
 
   // Ensure the thumbnail directory exists
-  if (!fs.existsSync("thumbnails")) {
-    fs.mkdirSync("thumbnails");
+  if (!fs.existsSync("files")) {
+    fs.mkdirSync("files");
   }
 
   return new Promise((resolve, reject) => {
@@ -55,9 +55,9 @@ const getVideoMetadata = async (req) => {
         reject({ error: "Could not generate thumbnail" });
       })
       .screenshots({
-        count: 1, // Number of thumbnails to generate
-        folder: "thumbnails", // Directory to save the thumbnail
-        filename: `${req.file.filename}-thumbnail.png`, // Thumbnail file name
+        count: 1, // Number of files to generate
+        folder: "files", // Directory to save the thumbnail
+        filename: `${req.file.originalname.split(".")[0]}-thumbnail.png`, // Thumbnail file name
         size: "320x240", // Thumbnail size (adjust as needed)
       });
   });
