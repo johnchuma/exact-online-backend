@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const { ShopFollower } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
+const { findUserByID } = require("../users/users.controllers");
 
 const findShopFollowerByID = async (id) => {
   try {
@@ -30,7 +31,6 @@ const addShopFollower = async (req, res) => {
 };
 const getShopFollowers = async (req, res) => {
   try {
-    
     const response = await ShopFollower.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -62,7 +62,6 @@ const getShopFollower = async (req, res) => {
 const updateShopFollower = async (req, res) => {
   try {
     const { id } = req.params;
-    const shopview = await findShopFollowerByID(id);
     const response = await shopview.update({
       ...req.body,
     });

@@ -12,6 +12,7 @@ const router = Router();
 
 router.post("/", validateJWT, addShopFollower);
 router.get("/", validateJWT, getPagination, getShopFollowers);
+router.get("/shop/:id", validateJWT, getPagination, getShopFollowers);
 router.get("/:id", validateJWT, getShopFollower);
 router.patch("/:id", validateJWT, updateShopFollower);
 router.delete("/:id", validateJWT, deleteShopFollower);

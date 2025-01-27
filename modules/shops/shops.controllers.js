@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, fn } = require("sequelize");
 const {
   Shop,
   ShopCalender,
@@ -6,9 +6,11 @@ const {
   ShopDocument,
   ShopView,
   ShopFollower,
+  Sequelize,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const { Fn } = require("sequelize/lib/utils");
 
 const findShopByID = async (id) => {
   try {
@@ -86,6 +88,52 @@ const getUserShops = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const getUserShopFollowings = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await Shop.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      attributes: [
+        "id", // Include the shop ID or other relevant fields
+        [
+          Sequelize.literal(
+            `(SELECT COUNT(*) 
+              FROM "ShopFollowers"
+              WHERE "ShopFollowers"."ShopId" = "Shop"."id"
+              AND "ShopFollowers"."UserId" = '${id}')`
+          ),
+          "followers", // Alias for the count of followers
+        ],
+      ],
+      include: [
+        {
+          model: ShopFollower,
+          where: {
+            UserId: id,
+          },
+          required: true, // Ensures that only shops with followings are returned
+        },
+      ],
+      group: ["Shop.id"], // Group by Shop ID to get followers per shop
+    });
+
+    // Fix for count: it should be a single number, not an array
+    const count = response.count; // You can use this value directly, it's the total number of shops
+    const rows = response.rows.map((shop) => ({
+      ...shop.dataValues,
+      followers: parseInt(shop.dataValues.followers, 10), // Parse followers as integer
+    }));
+
+    successResponse(res, {
+      count, // Total number of shops
+      page: req.page,
+      rows, // Properly formatted rows
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 
 const getShop = async (req, res) => {
   try {
@@ -127,6 +175,7 @@ module.exports = {
   getShops,
   addShop,
   deleteShop,
+  getUserShopFollowings,
   addShop,
   getShop,
   getUserShops,
