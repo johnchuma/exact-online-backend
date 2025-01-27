@@ -149,6 +149,12 @@ const updateShop = async (req, res) => {
     const { id } = req.params;
     console.log(id, req.body);
     const shop = await findShopByID(id);
+
+    let url = await getUrl(req);
+    console.log(url, req.body);
+    if (url) {
+      req.body.shopImage = url;
+    }
     const response = await shop.update({
       ...req.body,
     });

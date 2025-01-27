@@ -24,7 +24,7 @@ router.get(
   getUserShopFollowings
 );
 router.get("/:id", validateJWT, getShop);
-router.patch("/:id", validateJWT, updateShop);
+router.patch("/:id", upload.single("file"), validateJWT, updateShop);
 router.delete("/:id", validateJWT, deleteShop);
 
 module.exports = router;
