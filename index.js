@@ -52,6 +52,7 @@ const {
   adDimensionsTag,
   ordersTag,
   orderedProductsTag,
+  shopFollowersTag,
 } = require("./utils/apiSwaggerTags");
 // const responseTime = require("express-response-time");
 // app.use(responseTime());
@@ -76,7 +77,7 @@ app.use("/promoted-products", promotedProductsTag, PromotedProductsRoutes);
 app.use("/reels", reelsTag, ReelsRoutes);
 app.use("/shop-calenders", shopCalendersTag, ShopCalendersRoutes);
 app.use("/shop-documents", shopDocumentsTag, ShopDocumentsRoutes);
-app.use("/shop-followers", shopDocumentsTag, ShopFollowersRoutes);
+app.use("/shop-followers", shopFollowersTag, ShopFollowersRoutes);
 app.use("/shops", shopsTag, ShopsRoutes);
 app.use("/orders", ordersTag, OrdersRoutes);
 app.use("/ordered-products", orderedProductsTag, OrderedProductsRoutes);

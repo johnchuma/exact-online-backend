@@ -58,7 +58,6 @@ const getVideoMetadata = async (req) => {
         count: 1, // Number of files to generate
         folder: "files", // Directory to save the thumbnail
         filename: `${req.file.originalname.split(".")[0]}-thumbnail.png`, // Thumbnail file name
-        size: "320x240", // Thumbnail size (adjust as needed)
       });
   });
 };
