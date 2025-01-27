@@ -100,8 +100,7 @@ const getUserShopFollowings = async (req, res) => {
           Sequelize.literal(
             `(SELECT COUNT(*) 
               FROM "ShopFollowers"
-              WHERE "ShopFollowers"."ShopId" = "Shop"."id"
-              AND "ShopFollowers"."UserId" = '${id}')`
+              WHERE "ShopFollowers"."ShopId" = "Shop"."id")`
           ),
           "followers", // Alias for the count of followers
         ],
