@@ -1,22 +1,9 @@
 const { Op } = require("sequelize");
-const { Reel, User, Shop, Sequelize } = require("../../models");
+const { Reel, User, Shop, Sequelize, ShopFollower } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getVideoMetadata } = require("../../utils/get_video_metadata");
 
-const findReelByID = async (id) => {
-  try {
-    const reel = await Reel.findOne({
-      where: {
-        id,
-      },
-    });
-    return reel;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
 const addReel = async (req, res) => {
   try {
     let { caption, ShopId } = req.body;
@@ -61,7 +48,6 @@ const getShopReels = async (req, res) => {
   try {
     const { id } = req.params;
     console.log(id);
-    const user = req.user;
 
     const response = await Reel.findAndCountAll({
       limit: req.limit,
@@ -70,6 +56,31 @@ const getShopReels = async (req, res) => {
         caption: {
           [Op.like]: `%${req.keyword}%`,
         },
+      },
+      include: [
+        {
+          model: Shop,
+        },
+      ],
+    });
+
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      rows: response.rows,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+
+const getReel = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+    const reel = await Reel.findOne({
+      where: {
+        id,
       },
       include: [
         {
@@ -89,25 +100,19 @@ const getShopReels = async (req, res) => {
               ],
             ],
           },
+          include: [
+            {
+              model: ShopFollower,
+              where: {
+                UserId: user.id,
+              },
+              required: false,
+            },
+          ],
         },
       ],
       replacements: { userId: user.id }, // Passing user.id as a parameter
     });
-
-    successResponse(res, {
-      count: response.count,
-      page: req.page,
-      rows: response.rows,
-    });
-  } catch (error) {
-    errorResponse(res, error);
-  }
-};
-
-const getReel = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const reel = await findReelByID(id);
     successResponse(res, reel);
   } catch (error) {
     errorResponse(res, error);
@@ -137,7 +142,6 @@ const deleteReel = async (req, res) => {
 };
 
 module.exports = {
-  findReelByID,
   getReels,
   addReel,
   getShopReels,
