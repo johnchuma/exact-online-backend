@@ -39,10 +39,6 @@ const getVideoMetadata = async (req) => {
           const duration = formatDuration(metadata.format.duration); // Convert duration to MM:SS format
 
           // Clean up the uploaded file (optional)
-          fs.unlink(videoPath, (unlinkErr) => {
-            if (unlinkErr)
-              console.error("Error deleting uploaded file:", unlinkErr);
-          });
 
           resolve({
             duration,
