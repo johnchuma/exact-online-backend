@@ -34,11 +34,6 @@ const getShopFollowers = async (req, res) => {
     const response = await ShopFollower.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        title: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
     });
     successResponse(res, {
       count: response.count,

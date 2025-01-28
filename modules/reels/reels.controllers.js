@@ -56,6 +56,7 @@ const getShopReels = async (req, res) => {
         caption: {
           [Op.like]: `%${req.keyword}%`,
         },
+        ShopId:id
       },
       include: [
         {
