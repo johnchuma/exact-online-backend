@@ -9,6 +9,7 @@ const {
   getShopProducts,
   getNewArrivalProducts,
   getProductsForYou,
+  getRelatedProducts,
 } = require("./products.controllers");
 const { getPagination } = require("../../utils/getPagination");
 const upload = require("../../utils/upload");
@@ -17,9 +18,15 @@ const router = Router();
 
 router.post("/", validateJWT, addProduct);
 router.get("/", validateJWT, getPagination, getProducts);
-router.get("/new", validateJWT, getPagination,getNewArrivalProducts);
+router.get("/new", validateJWT, getPagination, getNewArrivalProducts);
 router.get("/for-you", validateJWT, getPagination, getProductsForYou);
 router.get("/shop/:id", validateJWT, getPagination, getShopProducts);
+router.get(
+  "/related/product/:id",
+  validateJWT,
+  getPagination,
+  getRelatedProducts
+);
 router.get("/:id", validateJWT, getProduct);
 router.patch("/:id", validateJWT, updateProduct);
 router.delete("/:id", validateJWT, deleteProduct);
