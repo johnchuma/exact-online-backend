@@ -94,17 +94,18 @@ const getUserShopFollowings = async (req, res) => {
     const response = await Shop.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      attributes: [
-        "id", // Include the shop ID or other relevant fields
-        [
-          Sequelize.literal(
-            `(SELECT COUNT(*) 
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(
+              `(SELECT COUNT(*) 
               FROM "ShopFollowers"
               WHERE "ShopFollowers"."ShopId" = "Shop"."id")`
-          ),
-          "followers", // Alias for the count of followers
+            ),
+            "followers", // Alias for the count of followers
+          ],
         ],
-      ],
+      },
       include: [
         {
           model: ShopFollower,

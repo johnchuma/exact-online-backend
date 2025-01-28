@@ -56,14 +56,14 @@ const addProduct = async (req, res) => {
 };
 const getProducts = async (req, res) => {
   try {
-    const {category} = req.query;
-    let filter  = {
+    const { category } = req.query;
+    let filter = {
       name: {
         [Op.like]: `%${req.keyword}%`,
       },
     };
-    if(category && category != "All"){
-       filter.CategoryId = category
+    if (category && category != "All") {
+      filter.CategoryId = category;
     }
     const response = await Product.findAndCountAll({
       limit: req.limit,
@@ -145,6 +145,29 @@ const getShopProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const getRelatedProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await findProductByID(id);
+    const response = await Product.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+      },
+      include: [ProductImage, ProductStat, ProductReview],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -186,6 +209,7 @@ module.exports = {
   getNewArrivalProducts,
   getProductsForYou,
   addProduct,
+  getRelatedProducts,
   getProduct,
   updateProduct,
 };
