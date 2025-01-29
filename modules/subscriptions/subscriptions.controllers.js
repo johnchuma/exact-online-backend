@@ -26,6 +26,7 @@ const addSubscription = async (req, res) => {
       price,
       duration,
     } = req.body;
+    console.log(req.body)
     const response = await Subscription.create({
       title,
       hint,

@@ -109,6 +109,7 @@ const getUserShopFollowings = async (req, res) => {
       include: [
         {
           model: ShopFollower,
+          attributes:[],
           where: {
             UserId: id,
           },
