@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Category,CategoryProductSpecification } = require("../../models");
+const { Category, CategoryProductSpecification } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -40,7 +40,7 @@ const getCategories = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include:[CategoryProductSpecification]
+      include: [CategoryProductSpecification],
     });
     successResponse(res, {
       count: response.count,
@@ -65,8 +65,12 @@ const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await findCategoryByID(id);
+    const image = await getUrl(req);
+    if (image) {
+      req.body.image = image;
+    }
     const response = await category.update({
-      ...req.body,
+      ...req.body
     });
     successResponse(res, response);
   } catch (error) {

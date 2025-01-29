@@ -15,7 +15,7 @@ const router = Router();
 router.post("/", validateJWT, upload.single("file"), addCategory);
 router.get("/", validateJWT, getPagination, getCategories);
 router.get("/:id", validateJWT, getCategory);
-router.patch("/:id", validateJWT, updateCategory);
+router.patch("/:id", validateJWT, upload.single("file"), updateCategory);
 router.delete("/:id", validateJWT, deleteCategory);
 
 module.exports = router;
