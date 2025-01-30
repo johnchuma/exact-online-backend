@@ -101,6 +101,22 @@ const getNewArrivalProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const getProductSearch = async (req, res) => {
+  try {
+    const { keyword } = req.params;
+    const response = await Product.findAll({
+      attributes: ["name"],
+      where: {
+        name: {
+          [Op.like]: `%${keyword}%`,
+        },
+      },
+    });
+    successResponse(res, response);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getProductsForYou = async (req, res) => {
   try {
     const response = await Product.findAndCountAll({
@@ -208,6 +224,7 @@ module.exports = {
   getShopProducts,
   getNewArrivalProducts,
   getProductsForYou,
+  getProductSearch,
   addProduct,
   getRelatedProducts,
   getProduct,
