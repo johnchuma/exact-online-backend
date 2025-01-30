@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Favorite } = require("../../models");
+const { Favorite,Product,ProductImage, ProductStat, ProductReview } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 
 const findFavoriteByID = async (id) => {
@@ -48,7 +48,32 @@ const getFavorites = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const getUserFavorites = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const response = await Favorite.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        title: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+        UserId:id
+      },
+      include:[{
+        model:Product,
+        include: [ProductImage, ProductStat, ProductReview]
+      }]
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getFavorite = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,6 +112,7 @@ module.exports = {
   addFavorite,
   deleteFavorite,
   addFavorite,
+  getUserFavorites,
   getFavorite,
   updateFavorite,
 };

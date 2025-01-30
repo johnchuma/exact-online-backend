@@ -66,12 +66,15 @@ const updateCategory = async (req, res) => {
     const { id } = req.params;
     const category = await findCategoryByID(id);
     const image = await getUrl(req);
-    if (image) {
+    console.log(req.body)
+    console.log(image)
+    if (image != null) {
       req.body.image = image;
     }
     const response = await category.update({
       ...req.body
     });
+    console.log(req.body)
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
