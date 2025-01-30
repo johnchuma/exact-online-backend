@@ -51,7 +51,6 @@ const getCategories = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
 const getCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,7 +69,7 @@ const updateCategory = async (req, res) => {
       req.body.image = image;
     }
     const response = await category.update({
-      ...req.body
+      ...req.body,
     });
     successResponse(res, response);
   } catch (error) {
@@ -87,7 +86,6 @@ const deleteCategory = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
 module.exports = {
   findCategoryByID,
   getCategories,
