@@ -4,6 +4,7 @@ const {
   ProductImage,
   ProductStat,
   ProductReview,
+  Shop,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
@@ -15,7 +16,7 @@ const findProductByID = async (id) => {
       where: {
         id,
       },
-      include: [ProductImage, ProductStat, ProductReview],
+      include: [ProductImage, ProductStat, ProductReview,Shop],
     });
     return product;
   } catch (error) {
