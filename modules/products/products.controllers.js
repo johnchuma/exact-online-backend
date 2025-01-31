@@ -105,7 +105,7 @@ const getNewArrivalProducts = async (req, res) => {
 const getProductSearch = async (req, res) => {
   try {
     const { keyword } = req.params;
-    console.log(keyword)
+    console.log(keyword);
     const response = await Product.findAll({
       where: {
         name: {
