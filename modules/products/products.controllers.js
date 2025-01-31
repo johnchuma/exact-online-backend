@@ -15,6 +15,7 @@ const findProductByID = async (id) => {
       where: {
         id,
       },
+      include: [ProductImage, ProductStat, ProductReview],
     });
     return product;
   } catch (error) {
