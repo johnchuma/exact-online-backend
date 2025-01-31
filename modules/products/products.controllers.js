@@ -104,11 +104,11 @@ const getNewArrivalProducts = async (req, res) => {
 const getProductSearch = async (req, res) => {
   try {
     const { keyword } = req.params;
+    console.log(keyword)
     const response = await Product.findAll({
-      attributes: ["name"],
       where: {
         name: {
-          [Op.like]: `%${keyword}%`,
+          [Op.iLike]: `%${keyword}%`,
         },
       },
     });
