@@ -26,13 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      ShopId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
       status: {
-        type: DataTypes.STRING,
-        defaultValue: "Pending",
+        type: DataTypes.ENUM("IN CART", "ORDERERED", "DELIVERED"),
+        defaultValue: "IN CART",
       },
     },
     {

@@ -17,6 +17,18 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      quantity: {
+        type: DataTypes.DOUBLE,
+        defautlValue: 1,
+      },
+      color: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      size: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

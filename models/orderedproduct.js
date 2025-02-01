@@ -28,6 +28,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      quantity: {
+        type: DataTypes.DOUBLE,
+        defautlValue: 1,
+      },
+      color: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      size: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       sequelize,

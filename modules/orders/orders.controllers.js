@@ -20,10 +20,9 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    let { UserId, ShopId } = req.body;
+    let { UserId } = req.body;
     const response = await Order.create({
       UserId,
-      ShopId,
     });
     successResponse(res, response);
   } catch (error) {
