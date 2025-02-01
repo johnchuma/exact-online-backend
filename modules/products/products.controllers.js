@@ -4,6 +4,7 @@ const {
   ProductImage,
   ProductStat,
   ProductReview,
+  Favorite,
   Shop,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
@@ -71,7 +72,13 @@ const getProducts = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: filter,
-      include: [ProductImage, ProductStat, ProductReview],
+      include: [ProductImage, ProductStat, ProductReview,{
+        model:Favorite,
+        where:{
+          UserId:req.user.id
+        },
+        required:false
+      }],
     });
     successResponse(res, {
       count: response.count,
@@ -92,7 +99,13 @@ const getNewArrivalProducts = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [ProductImage, ProductStat, ProductReview],
+      include: [ProductImage, ProductStat, ProductReview,{
+        model:Favorite,
+        where:{
+          UserId:req.user.id
+        },
+        required:false
+      }],
     });
     successResponse(res, {
       count: response.count,
@@ -121,6 +134,7 @@ const getProductSearch = async (req, res) => {
 };
 const getProductsForYou = async (req, res) => {
   try {
+    const {id} = req.user
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -129,7 +143,13 @@ const getProductsForYou = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [ProductImage, ProductStat, ProductReview],
+      include: [ProductImage, ProductStat, ProductReview,{
+        model:Favorite,
+        where:{
+          UserId:req.user.id
+        },
+        required:false
+      }],
     });
     successResponse(res, {
       count: response.count,
@@ -152,7 +172,13 @@ const getShopProducts = async (req, res) => {
         },
         ShopId: id,
       },
-      include: [ProductImage, ProductStat, ProductReview],
+      include: [ProductImage, ProductStat, ProductReview,{
+        model:Favorite,
+        where:{
+          UserId:req.user.id
+        },
+        required:false
+      }],
     });
     successResponse(res, {
       count: response.count,
@@ -175,7 +201,14 @@ const getRelatedProducts = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [ProductImage, ProductStat, ProductReview],
+      include: [ProductImage, ProductStat, ProductReview,{
+        model:Favorite,
+        where:{
+          UserId:req.user.id
+        },
+        required:false
+
+      }],
     });
     successResponse(res, {
       count: response.count,
@@ -189,7 +222,19 @@ const getRelatedProducts = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await findProductByID(id);
+    const product = await  Product.findOne({
+      where: {
+        id,
+      },
+      include: [ProductImage, ProductStat, ProductReview,Shop,{
+        model:Favorite,
+        where:{
+          UserId:req.user.id
+        },
+        required:false
+
+      }],
+    });
     successResponse(res, product);
   } catch (error) {
     errorResponse(res, error);

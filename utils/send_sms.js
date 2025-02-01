@@ -5,7 +5,7 @@ require("dotenv").config();
 const sendSMS = async (number, message) => {
   try {
     const data = JSON.stringify({
-      from: "RMNDR",
+      from: "ExactOnline",
       to: number,
       text: "Your message",
     });
@@ -25,6 +25,7 @@ const sendSMS = async (number, message) => {
     );
     // Convert the response data to a string, handling circular references
     const jsonString = circularJSON.stringify(response.data);
+    console.log(jsonString)
     return jsonString;
   } catch (error) {
     console.log(error);

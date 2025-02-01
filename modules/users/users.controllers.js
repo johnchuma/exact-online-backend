@@ -5,6 +5,7 @@ const { errorResponse, successResponse } = require("../../utils/responses");
 const { randomNumber } = require("../../utils/random_number");
 const bcrypt = require("bcrypt");
 const { getUrl } = require("../../utils/get_url");
+const sendSMS = require("../../utils/send_sms");
 const findUserByID = async (id) => {
   try {
     const user = await User.findOne({
@@ -57,6 +58,8 @@ const addUser = async (req, res) => {
       let code = randomNumber();
       code = 123456;
       //send verfication code sms
+      // await sendSMS(phone,`Hi ${name}, your verification code is ${code}, Enter it in the form to continue on the app.`)
+
       if(password){
         password = bcrypt.hashSync(password, 10);
       }
@@ -86,10 +89,11 @@ const sendVerificationCode = async (req, res) => {
       let code = randomNumber();
       code = 123456;
       //send verfication code sms
+      // await sendSMS(phone,`Hi ${user.name}, your verification code is ${code}, Enter it in the form to continue on the app.`)
       user = await user.update({
         passcode: code,
       });
-
+       
       successResponse(res, {
         status: true,
         message: "Verification code is sent to your phone number",

@@ -34,9 +34,7 @@ const getFavorites = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        title: {
-          [Op.like]: `%${req.keyword}%`,
-        },
+        
       },
     });
     successResponse(res, {
@@ -55,9 +53,7 @@ const getUserFavorites = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        title: {
-          [Op.like]: `%${req.keyword}%`,
-        },
+     
         UserId:id
       },
       include:[{
@@ -98,7 +94,9 @@ const updateFavorite = async (req, res) => {
 const deleteFavorite = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id)
     const favorite = await findFavoriteByID(id);
+    console.log(favorite)
     const response = await favorite.destroy();
     successResponse(res, response);
   } catch (error) {
