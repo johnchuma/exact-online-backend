@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Product.belongsTo(models.Shop)
       Product.hasMany(models.Favorite)
+      Product.hasMany(models.OrderedProduct)
       Product.hasMany(models.PromotedProduct, {
         onDelete: "CASCADE",
         scope: true,

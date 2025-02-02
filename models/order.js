@@ -8,9 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Order.hasMany(models.OrderedProduct);
       Order.belongsTo(models.User);
-      Order.belongsTo(models.Shop);
       // define association here
     }
   }
@@ -27,8 +25,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("IN CART", "ORDERERED", "DELIVERED"),
-        defaultValue: "IN CART",
+        type: DataTypes.ENUM("ON CART", "ORDERED", "DELIVERED"),
+        defaultValue: "ON CART",
       },
     },
     {

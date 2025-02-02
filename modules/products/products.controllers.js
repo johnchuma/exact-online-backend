@@ -3,6 +3,7 @@ const {
   Product,
   ProductImage,
   ProductStat,
+  OrderedProduct,
   ProductReview,
   Favorite,
   Shop,
@@ -233,7 +234,7 @@ const getProduct = async (req, res) => {
         },
         required:false
 
-      }],
+      },OrderedProduct],
     });
     successResponse(res, product);
   } catch (error) {

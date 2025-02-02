@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Shop, User, OrderedProduct } = require("../../models");
+const { Shop, User, OrderedProduct,Order } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getUserChats } = require("../chats/chats.controllers");
@@ -20,9 +20,8 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    let { UserId } = req.body;
     const response = await Order.create({
-      UserId,
+      UserId:req.user.id,
     });
     successResponse(res, response);
   } catch (error) {

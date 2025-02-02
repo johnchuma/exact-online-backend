@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { OrderedProduct, User } = require("../../models");
+const { OrderedProduct, User,Product,Order,ProductImage, ProductStat, ProductReview,Shop } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -34,11 +34,7 @@ const getOrderedProducts = async (req, res) => {
     const response = await OrderedProduct.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        title: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
+    
       include: [Shop],
     });
     successResponse(res, {
@@ -50,7 +46,32 @@ const getOrderedProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
+const findOnCartOrderedProducts = async (req, res) => {
+  try {
+    const response = await OrderedProduct.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      include:[{
+        model:Order,
+        where:{
+          status:"ON CART",
+          UserId:req.user.id
+        },
+        required:true
+      },{
+        model:Product,
+        include: [ProductImage, ProductStat, ProductReview,Shop],
+      }],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getOrderedProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -89,6 +110,7 @@ module.exports = {
   addOrderedProduct,
   deleteOrderedProduct,
   addOrderedProduct,
+findOnCartOrderedProducts,
   getOrderedProduct,
   updateOrderedProduct,
 };
