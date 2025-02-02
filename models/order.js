@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("ON CART", "ORDERED", "DELIVERED"),
+        type: DataTypes.STRING,
         defaultValue: "ON CART",
       },
     },

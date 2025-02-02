@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("ON CART", "ORDERED", "DELIVERED"),
+        type: DataTypes.STRING,
         defaultValue: "ON CART",
       },
       createdAt: {
