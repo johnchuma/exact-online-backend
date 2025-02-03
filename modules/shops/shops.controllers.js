@@ -17,7 +17,8 @@ const findShopByID = async (id) => {
     const shop = await Shop.findOne({
       where: {
         id,
-      }
+      },
+      include:[ShopCalender,ShopSubscription,ShopView]
     });
     return shop;
   } catch (error) {

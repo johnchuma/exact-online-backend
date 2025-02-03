@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const { ShopCalender } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const shopcalender = require("../../models/shopcalender");
 
 const findShopCalenderByID = async (id) => {
   try {
@@ -18,15 +19,27 @@ const findShopCalenderByID = async (id) => {
 };
 const addShopCalender = async (req, res) => {
   try {
+    
     let { ShopId, day, openTime, closeTime, isOpen } = req.body;
-    const response = await ShopCalender.create({
-      ShopId,
-      openTime,
-      day,
-      closeTime,
-      isOpen,
-    });
-    successResponse(res, response);
+    let shopCalender = await ShopCalender.findOne({
+      where:{
+        day,ShopId
+      }
+    })
+
+    if(!shopCalender){
+      shopcalender = await ShopCalender.create({
+        ShopId,
+        openTime,
+        day,
+        closeTime,
+        isOpen,
+      });
+    }else{
+      await shopCalender.update(req.body)
+    }
+    
+    successResponse(res, shopCalender);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);

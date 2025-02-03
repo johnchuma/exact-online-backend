@@ -10,22 +10,26 @@ module.exports = {
         defaultValue: DataTypes.UUIDV4,
       },
       message: {
-        type: DataTypes.TEXT,
+        type: DataTypes.TEXT("long"),
         allowNull: false,
       },
       image: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      sentBy: {
+        type: DataTypes.ENUM("Shop","User"),
         allowNull: false,
       },
       ChatId: {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      UserId: {
+      OrderId: {
         type: DataTypes.UUID,
         allowNull: true,
       },
-      ShopId: {
+      ProductId: {
         type: DataTypes.UUID,
         allowNull: true,
       },

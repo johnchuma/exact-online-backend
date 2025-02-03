@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Message.belongsTo(models.Chat);
+      Message.belongsTo(models.Order);
+      Message.belongsTo(models.Product);
     }
   }
   Message.init(
@@ -20,25 +23,30 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
       },
       message: {
-        type: DataTypes.TEXT,
+        type: DataTypes.TEXT("long"),
         allowNull: false,
       },
       image: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      sentBy: {
+        type: DataTypes.ENUM("Shop","User"),
         allowNull: false,
       },
       ChatId: {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      UserId: {
+      OrderId: {
         type: DataTypes.UUID,
         allowNull: true,
       },
-      ShopId: {
+      ProductId: {
         type: DataTypes.UUID,
         allowNull: true,
       },
+     
     },
     {
       sequelize,

@@ -47,7 +47,7 @@ const addAdmin = async (req, res) => {
 const addUser = async (req, res) => {
   try {
     let { name, phone, email, role, password } = req.body;
-
+  console.log(req.body);
     let user = await checkIfUserExists(phone);
     if (user) {
       res.status(403).send({
@@ -58,7 +58,7 @@ const addUser = async (req, res) => {
       let code = randomNumber();
       // code = 123456;
       //send verfication code sms
-      await sendSMS(phone,`Dear ${user.name},\n\n your verification code is ${code}, Enter this code in the form to preceed with the app. \n\nThank you`)
+      await sendSMS(phone,`Dear ${name},\n\n your verification code is ${code}, Enter this code in the form to preceed with the app. \n\nThank you`)
 
       if(password){
         password = bcrypt.hashSync(password, 10);

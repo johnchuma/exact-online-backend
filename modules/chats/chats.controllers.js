@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Chat } = require("../../models");
+const { Chat,Shop,User } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 
 const findChatByID = async (id) => {
@@ -18,11 +18,20 @@ const findChatByID = async (id) => {
 const addChat = async (req, res) => {
   try {
     let { ShopId, UserId } = req.body;
-    const response = await Chat.create({
-      ShopId,
-      UserId,
-    });
-    successResponse(res, response);
+    let chat  = await Chat.findOne({
+      where:{
+        ShopId,
+        UserId,
+      },
+      include:[Shop,User]
+    })
+    if(!chat){
+      chat =  await Chat.create({
+        ShopId,
+        UserId,
+      });
+    }
+    successResponse(res, chat);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
