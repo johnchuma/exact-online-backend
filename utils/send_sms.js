@@ -1,13 +1,14 @@
 const axios = require("axios");
 const circularJSON = require("circular-json");
+const addPrefixToPhoneNumber = require("./add_number_prefix");
 require("dotenv").config();
 
 const sendSMS = async (number, message) => {
   try {
     const data = JSON.stringify({
       from: "ExactOnline",
-      to: number,
-      text: "Your message",
+      to: addPrefixToPhoneNumber(number),
+      text: message,
     });
 
     console.log(data);

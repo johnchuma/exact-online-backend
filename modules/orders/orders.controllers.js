@@ -1,18 +1,18 @@
 const { Op } = require("sequelize");
-const { Shop, User, OrderedProduct,Order } = require("../../models");
+const { Shop, User, OrderedProduct,Order,Product } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getUserChats } = require("../chats/chats.controllers");
 
 const findOrderByID = async (id) => {
   try {
-    const reel = await Order.findOne({
+    const order = await Order.findOne({
       where: {
         id,
       },
-      include: [Shop, User, OrderedProduct],
+      include: [User, OrderedProduct],
     });
-    return reel;
+    return order;
   } catch (error) {
     console.log(error);
     throw error;
@@ -20,10 +20,19 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    const response = await Order.create({
-      UserId:req.user.id,
-    });
-    successResponse(res, response);
+    let order = await Order.findOne({
+      where:{
+        UserId:req.user.id,
+        status:"ON CART"
+      }
+    })
+    if(!order){
+      order = await Order.create({
+        UserId:req.user.id,
+      });
+    }
+    
+    successResponse(res, order);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
@@ -53,10 +62,21 @@ const getUserOrders = async (req, res) => {
       offset: req.offset,
       where: {
         UserId: id,
+        status:{
+          [Op.not]:"ON CART"
+        },
       },
-      include: [Shop],
+      include: [OrderedProduct,User],
     });
-  } catch (e) {}
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (e) {
+    errorResponse(res, error);
+
+  }
 };
 const getShopOrders = async (req, res) => {
   try {
@@ -65,9 +85,20 @@ const getShopOrders = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-        ShopId: id,
+        status:{
+          [Op.not]:"ON CART"
+        },
       },
-      include: [User],
+      include: [{
+        model:OrderedProduct,
+        include:[{
+          model:Product,
+          where:{
+            ShopId:id
+          },
+          required:true
+        }]
+      },User],
     });
     successResponse(res, {
       count: response.count,
@@ -81,8 +112,8 @@ const getShopOrders = async (req, res) => {
 const getOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findOrderByID(id);
-    successResponse(res, reel);
+    const order = await findOrderByID(id);
+    successResponse(res, order);
   } catch (error) {
     errorResponse(res, error);
   }
@@ -90,8 +121,8 @@ const getOrder = async (req, res) => {
 const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findOrderByID(id);
-    const response = await reel.update({
+    const order = await findOrderByID(id);
+    const response = await order.update({
       ...req.body,
     });
     successResponse(res, response);
@@ -102,8 +133,8 @@ const updateOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findOrderByID(id);
-    const response = await reel.destroy();
+    const order = await findOrderByID(id);
+    const response = await order.destroy();
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);

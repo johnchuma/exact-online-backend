@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Order.belongsTo(models.User);
+      Order.hasMany(models.OrderedProduct,{
+        onDelete: "CASCADE",
+        scope: true,
+      });
       // define association here
     }
   }

@@ -6,6 +6,7 @@ const {
   OrderedProduct,
   ProductReview,
   Favorite,
+  Order,
   Shop,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
@@ -234,7 +235,15 @@ const getProduct = async (req, res) => {
         },
         required:false
 
-      },OrderedProduct],
+      },{
+        model:OrderedProduct,
+        include:[{
+          model:Order,
+          where:{
+            status:"ON CART"
+          }
+        }]
+      }],
     });
     successResponse(res, product);
   } catch (error) {

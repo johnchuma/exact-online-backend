@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { OrderedProduct, User,Product,Order,ProductImage, ProductStat, ProductReview,Shop } = require("../../models");
+const { OrderedProduct, User,Product,Order,ProductImage, ProductStat, ProductReview,Shop,Favorite } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -46,6 +46,37 @@ const getOrderedProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const findOrderProducts = async (req, res) => {
+  try {
+    const response = await OrderedProduct.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      include:[{
+        model:Order,
+        where:{
+          id:req.params.id,
+        },
+        required:true
+      },{
+        model:Product,
+        include: [ProductImage, ProductStat, ProductReview,Shop,{
+          model:Favorite,
+          where:{
+            UserId:req.user.id
+          },
+          required:false
+        }],
+      }],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const findOnCartOrderedProducts = async (req, res) => {
   try {
     const response = await OrderedProduct.findAndCountAll({
@@ -60,7 +91,13 @@ const findOnCartOrderedProducts = async (req, res) => {
         required:true
       },{
         model:Product,
-        include: [ProductImage, ProductStat, ProductReview,Shop],
+        include: [ProductImage, ProductStat, ProductReview,Shop,{
+          model:Favorite,
+          where:{
+            UserId:req.user.id
+          },
+          required:false
+        }],
       }],
     });
     successResponse(res, {
@@ -108,6 +145,7 @@ module.exports = {
   findOrderedProductByID,
   getOrderedProducts,
   addOrderedProduct,
+  findOrderProducts,
   deleteOrderedProduct,
   addOrderedProduct,
 findOnCartOrderedProducts,

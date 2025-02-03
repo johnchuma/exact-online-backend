@@ -56,9 +56,9 @@ const addUser = async (req, res) => {
       });
     } else {
       let code = randomNumber();
-      code = 123456;
+      // code = 123456;
       //send verfication code sms
-      // await sendSMS(phone,`Hi ${name}, your verification code is ${code}, Enter it in the form to continue on the app.`)
+      await sendSMS(phone,`Dear ${user.name},\n\n your verification code is ${code}, Enter this code in the form to preceed with the app. \n\nThank you`)
 
       if(password){
         password = bcrypt.hashSync(password, 10);
@@ -87,9 +87,9 @@ const sendVerificationCode = async (req, res) => {
     let user = await checkIfUserExists(phone);
     if (user) {
       let code = randomNumber();
-      code = 123456;
+      // code = 123456;
       //send verfication code sms
-      // await sendSMS(phone,`Hi ${user.name}, your verification code is ${code}, Enter it in the form to continue on the app.`)
+      await sendSMS(phone,`Dear ${user.name},\nyour verification code is ${code}, Enter this code in the form to proceed with the app. \n\nThank you`)
       user = await user.update({
         passcode: code,
       });
