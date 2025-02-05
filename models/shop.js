@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
-      Shop.hasMany(models.ShopSubscription, {
+      Shop.hasOne(models.ShopSubscription, {
         onDelete: "CASCADE",
         scope: true,
       });

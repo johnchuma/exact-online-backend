@@ -11,6 +11,7 @@ const {
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { Fn } = require("sequelize/lib/utils");
+const moment = require("moment");
 
 const findShopByID = async (id) => {
   try {
@@ -140,7 +141,43 @@ const getShop = async (req, res) => {
   try {
     const { id } = req.params;
     console.log(id);
-    const shop = await findShopByID(id);
+    const shop = await Shop.findOne({
+      where: {
+        id,
+      },
+      attributes:{
+        include: [
+          [
+            Sequelize.literal(
+              `(EXISTS (
+                SELECT 1
+                FROM "ShopSubscriptions"
+                WHERE "ShopSubscriptions"."ShopId" = "Shop"."id"
+                AND "ShopSubscriptions"."expireDate" > NOW() 
+              ))`
+            ),
+            "isSubscribed",
+          ],
+          [
+            Sequelize.literal(
+              `(SELECT COUNT(*) 
+              FROM "ShopFollowers"
+              WHERE "ShopFollowers"."ShopId" = "Shop"."id")`
+            ),
+            "followers", // Alias for the count of followers
+          ],
+        ],
+      },
+      include:[ShopCalender,{
+        model:ShopSubscription,
+        where:{
+          expireDate:{
+            [Op.gt]:Date.now()
+          }
+        },
+        required:false
+      },ShopView,],
+    });
     successResponse(res, shop);
   } catch (error) {
     errorResponse(res, error);

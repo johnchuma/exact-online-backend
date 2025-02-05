@@ -10,6 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Reel.belongsTo(models.Shop);
+      Reel.hasMany(models.ReelStat);
+    
     }
   }
   Reel.init(

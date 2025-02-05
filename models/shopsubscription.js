@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      ShopSubscription.belongsTo(models.Shop)
+      ShopSubscription.belongsTo(models.Subscription)
     }
   }
   ShopSubscription.init(
@@ -26,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       SubscriptionId: {
         type: DataTypes.UUID,
         allowNull: false,
+      },
+      expireDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     },
     {

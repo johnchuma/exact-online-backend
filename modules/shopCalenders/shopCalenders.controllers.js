@@ -19,32 +19,30 @@ const findShopCalenderByID = async (id) => {
 };
 const addShopCalender = async (req, res) => {
   try {
-    
-    let { ShopId, day, openTime, closeTime, isOpen } = req.body;
-    let shopCalender = await ShopCalender.findOne({
-      where:{
-        day,ShopId
-      }
-    })
+    let { ShopId, day, openTime, closeTime, isOpen } = req.body; 
 
-    if(!shopCalender){
-      shopcalender = await ShopCalender.create({
+    let shopCalender = await ShopCalender.findOne({
+      where: { day, ShopId },
+    });
+    if (!shopCalender) {
+      shopCalender = await ShopCalender.create({  
         ShopId,
         openTime,
         day,
         closeTime,
         isOpen,
       });
-    }else{
-      await shopCalender.update(req.body)
+    } else {
+      await shopCalender.update(req.body);
     }
-    
+
     successResponse(res, shopCalender);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     errorResponse(res, error);
   }
 };
+
 const getShopCalenders = async (req, res) => {
   try {
     const response = await ShopCalender.findAndCountAll({

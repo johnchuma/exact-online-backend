@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Subscription.hasMany(models.ShopSubscription, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
     }
   }
   Subscription.init(
@@ -41,10 +45,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       price: {
         type: DataTypes.DOUBLE,
-        allowNull: false,
+        allowNull: false,   
       },
       duration: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      days: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },

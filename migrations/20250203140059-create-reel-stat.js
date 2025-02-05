@@ -1,37 +1,37 @@
-"use strict";
+'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("ShopSubscriptions", {
+    await queryInterface.createTable('ReelStats', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      ShopId: {
+      ReelId: {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      SubscriptionId: {
+      UserId: {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      expireDate: {
-        type: DataTypes.DATE,
-        allowNull: true,
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
-        type: DataTypes.DATE,
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.DATE,
-      },
+        type: DataTypes.DATE
+      }
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable("ShopSubscriptions");
-  },
+    await queryInterface.dropTable('ReelStats');
+  }
 };

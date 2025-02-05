@@ -21,6 +21,7 @@ const ReelsRoutes = require("./modules/reels/reels.routes");
 const ShopCalendersRoutes = require("./modules/shopCalenders/shopCalenders.routes");
 const ShopDocumentsRoutes = require("./modules/shopDocuments/shopDocuments.routes");
 const ShopsRoutes = require("./modules/shops/shops.routes");
+const ReelStatsRoutes = require("./modules/reelStats/reelStats.routes");
 const ShopsSubscriptionsRoutes = require("./modules/shopSubscriptions/shopSubscriptions.routes");
 const ShopViewRoutes = require("./modules/shopViews/shopViews.routes");
 const SubscriptionRoutes = require("./modules/subscriptions/subscriptions.routes");
@@ -57,6 +58,7 @@ const {
   orderedProductsTag,
   shopFollowersTag,
   favoritesTag,
+  reelStatsTag,
 } = require("./utils/apiSwaggerTags");
 const { Server } = require("socket.io");
 // const responseTime = require("express-response-time");
@@ -78,6 +80,7 @@ app.use("/product-images", productImagesTag, ProductImagesRoutes);
 app.use("/product-reviews", productReviewsTag, ProductReviewsRoutes);
 app.use("/products", productsTag, ProductsRoutes);
 app.use("/product-stats", productStatsTag, ProductStatsRoutes);
+app.use("/reel-stats", reelStatsTag, ReelStatsRoutes);
 app.use("/promoted-products", promotedProductsTag, PromotedProductsRoutes);
 app.use("/reels", reelsTag, ReelsRoutes);
 app.use("/shop-calenders", shopCalendersTag, ShopCalendersRoutes);
