@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Chat.belongsTo(models.User)
+      Chat.belongsTo(models.Shop)
     }
   }
   Chat.init(

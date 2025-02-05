@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
 const bodyParser = require("body-parser");
 const app = express();
+const fs = require("fs");
 const AdDimensionsRoutes = require("./modules/adDimensions/adDimensions.routes");
 const AdsRoutes = require("./modules/ads/ads.routes");
 const CategoriesRoutes = require("./modules/categories/categories.routes");
@@ -19,6 +21,7 @@ const ReelsRoutes = require("./modules/reels/reels.routes");
 const ShopCalendersRoutes = require("./modules/shopCalenders/shopCalenders.routes");
 const ShopDocumentsRoutes = require("./modules/shopDocuments/shopDocuments.routes");
 const ShopsRoutes = require("./modules/shops/shops.routes");
+const ReelStatsRoutes = require("./modules/reelStats/reelStats.routes");
 const ShopsSubscriptionsRoutes = require("./modules/shopSubscriptions/shopSubscriptions.routes");
 const ShopViewRoutes = require("./modules/shopViews/shopViews.routes");
 const SubscriptionRoutes = require("./modules/subscriptions/subscriptions.routes");
@@ -55,7 +58,9 @@ const {
   orderedProductsTag,
   shopFollowersTag,
   favoritesTag,
+  reelStatsTag,
 } = require("./utils/apiSwaggerTags");
+const { Server } = require("socket.io");
 // const responseTime = require("express-response-time");
 // app.use(responseTime());
 app.use("/files", express.static("files"));
@@ -75,6 +80,7 @@ app.use("/product-images", productImagesTag, ProductImagesRoutes);
 app.use("/product-reviews", productReviewsTag, ProductReviewsRoutes);
 app.use("/products", productsTag, ProductsRoutes);
 app.use("/product-stats", productStatsTag, ProductStatsRoutes);
+app.use("/reel-stats", reelStatsTag, ReelStatsRoutes);
 app.use("/promoted-products", promotedProductsTag, PromotedProductsRoutes);
 app.use("/reels", reelsTag, ReelsRoutes);
 app.use("/shop-calenders", shopCalendersTag, ShopCalendersRoutes);
@@ -98,8 +104,35 @@ app.use(
   CategoryProductSpecificationsRoutes
 );
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// const options = {
+//   key: fs.readFileSync("/etc/letsencrypt/live/api.exactonline.co.tz/privkey.pem"),
+//   cert: fs.readFileSync("/etc/letsencrypt/live/api.exactonline.co.tz/fullchain.pem"),
+// };
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Allow all origins (Adjust in production)
+    methods: ["GET", "POST"],
+  },
+});
+io.on("connection", (socket) => {
+  console.log(`User connected: ${socket.id}`);
+
+  // Listen for incoming messages
+  socket.on("sendMessage", (data) => {
+    // console.log("Message received:", data);
+    console.log("Message received", data);
+    io.emit("receiveMessage", data); // Broadcast to all clients
+  });
+
+  // Handle user disconnect
+  socket.on("disconnect", () => {
+    console.log(`User disconnected: ${socket.id}`);
+  });
+});
 app.get("/", (req, res) => {
   try {
     res.send("Server is working fine");

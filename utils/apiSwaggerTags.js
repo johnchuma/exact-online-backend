@@ -57,7 +57,10 @@ const productStatsTag = (req, res, next) => {
   // #swagger.tags = ['Product Stats']
   next();
 };
-
+const reelStatsTag = (req, res, next) => {
+  // #swagger.tags = ['Reel Stats']
+  next();
+};
 const promotedProductsTag = (req, res, next) => {
   // #swagger.tags = ['Promoted Products']
   next();
@@ -129,6 +132,7 @@ module.exports = {
   productImagesTag,
   productReviewsTag,
   productsTag,
+  reelStatsTag,
   productStatsTag,
   promotedProductsTag,
   reelsTag,

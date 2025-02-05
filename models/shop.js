@@ -17,11 +17,15 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      Shop.hasMany(models.Chat, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
       Shop.hasMany(models.ShopCalender, {
         onDelete: "CASCADE",
         scope: true,
       });
-      Shop.hasMany(models.ShopSubscription, {
+      Shop.hasOne(models.ShopSubscription, {
         onDelete: "CASCADE",
         scope: true,
       });

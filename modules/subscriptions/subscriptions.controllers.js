@@ -25,6 +25,7 @@ const addSubscription = async (req, res) => {
       originalPrice,
       price,
       duration,
+      days,
     } = req.body;
     
     const response = await Subscription.create({
@@ -35,6 +36,7 @@ const addSubscription = async (req, res) => {
       originalPrice,
       price,
       duration,
+      days
     });
     successResponse(res, response);
   } catch (error) {

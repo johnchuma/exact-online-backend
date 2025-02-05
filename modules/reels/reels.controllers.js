@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Reel, User, Shop, Sequelize, ShopFollower } = require("../../models");
+const { Reel, User, Shop, Sequelize, ShopFollower,ReelStat } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getVideoMetadata } = require("../../utils/get_video_metadata");
@@ -84,6 +84,13 @@ const getReel = async (req, res) => {
         id,
       },
       include: [
+       {
+        model:ReelStat,
+        where: {
+          UserId: user.id,
+        },
+        required:false
+       },
         {
           model: Shop,
           attributes: {
@@ -99,6 +106,18 @@ const getReel = async (req, res) => {
                 ),
                 "following", // Alias for whether the user follows the shop
               ],
+              [
+                Sequelize.literal(
+                  `(EXISTS (
+                    SELECT 1
+                    FROM "ReelStats"
+                    WHERE "ReelStats"."UserId" = :userId
+                    AND "ReelStats"."type" = 'like'
+                  ))`
+                ),
+                "liked", // Alias for whether the user follows the shop
+              ],
+              
             ],
           },
           include: [
@@ -109,8 +128,10 @@ const getReel = async (req, res) => {
               },
               required: false,
             },
+           
           ],
         },
+        
       ],
       replacements: { userId: user.id }, // Passing user.id as a parameter
     });

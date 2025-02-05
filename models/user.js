@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      User.hasMany(models.Chat, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
     }
   }
   User.init(
