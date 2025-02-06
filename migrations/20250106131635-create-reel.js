@@ -29,18 +29,6 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      views: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      likes: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      shares: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

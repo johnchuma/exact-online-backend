@@ -42,18 +42,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      views: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      likes: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      shares: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
     },
     {
       sequelize,

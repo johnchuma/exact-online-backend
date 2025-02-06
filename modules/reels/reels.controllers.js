@@ -33,6 +33,22 @@ const getReels = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ReelStats"
+                WHERE "ReelStats"."ReelId" = "Reel"."id"
+                AND "ReelStats"."type" = 'like'
+              )
+            `),
+            "likes", // Alias for total likes
+          ],
+          
+        ],
+      },
       include: [Shop],
     });
     successResponse(res, {
@@ -57,6 +73,22 @@ const getShopReels = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
         ShopId:id
+      },
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ReelStats"
+                WHERE "ReelStats"."ReelId" = "Reel"."id"
+                AND "ReelStats"."type" = 'like'
+              )
+            `),
+            "likes", // Alias for total likes
+          ],
+          
+        ],
       },
       include: [
         {
@@ -105,6 +137,17 @@ const getReel = async (req, res) => {
                   ))`
                 ),
                 "following", // Alias for whether the user follows the shop
+              ],
+              [
+                Sequelize.literal(`
+                  (
+                    SELECT COUNT(*)
+                    FROM "ReelStats"
+                    WHERE "ReelStats"."ReelId" = "Reel"."id"
+                    AND "ReelStats"."type" = 'like'
+                  )
+                `),
+                "likes", // Alias for total likes
               ],
               [
                 Sequelize.literal(
