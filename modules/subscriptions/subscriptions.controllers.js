@@ -38,6 +38,7 @@ const addSubscription = async (req, res) => {
       duration,
       days
     });
+    
     successResponse(res, response);
   } catch (error) {
     console.log(error);

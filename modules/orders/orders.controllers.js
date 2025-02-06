@@ -66,7 +66,13 @@ const getUserOrders = async (req, res) => {
           [Op.not]:"ON CART"
         },
       },
-      include: [OrderedProduct,User],
+      include: [{
+        model:OrderedProduct,
+        include:[{
+          model:Product,
+          include:[Shop]
+        }]
+      }, User],
     });
     successResponse(res, {
       count: response.count,

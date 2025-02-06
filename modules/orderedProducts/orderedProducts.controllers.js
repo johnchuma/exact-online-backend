@@ -46,8 +46,9 @@ const getOrderedProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const findOrderProducts = async (req, res) => {
+const findOrderProductsByUser = async (req, res) => {
   try {
+
     const response = await OrderedProduct.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -59,6 +60,43 @@ const findOrderProducts = async (req, res) => {
         required:true
       },{
         model:Product,
+        include: [ProductImage, ProductStat, ProductReview,Shop,{
+          model:Favorite,
+          where:{
+            UserId:req.user.id
+          },
+          required:false
+        }],
+      }],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
+const findOrderProductsByShop = async (req, res) => {
+  try {
+    
+    const response = await OrderedProduct.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      include:[{
+        model:Order,
+        where:{
+          id:req.params.id,
+        },
+        required:true
+      },{
+        model:Product,
+        where:{
+          ShopId:req.params.shopId
+        },
+        required:true,
+        
         include: [ProductImage, ProductStat, ProductReview,Shop,{
           model:Favorite,
           where:{
@@ -145,10 +183,11 @@ module.exports = {
   findOrderedProductByID,
   getOrderedProducts,
   addOrderedProduct,
-  findOrderProducts,
+  findOrderProductsByUser,
+  findOrderProductsByShop,
   deleteOrderedProduct,
   addOrderedProduct,
-findOnCartOrderedProducts,
+ findOnCartOrderedProducts,
   getOrderedProduct,
   updateOrderedProduct,
 };

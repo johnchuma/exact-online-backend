@@ -3,7 +3,7 @@ const { ShopSubscription } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { findSubscriptionByID } = require("../subscriptions/subscriptions.controllers");
-
+const moment = require("moment")
 const findShopSubscriptionByID = async (id) => {
   try {
     const shopsubscription = await ShopSubscription.findOne({
@@ -20,7 +20,7 @@ const findShopSubscriptionByID = async (id) => {
 const addShopSubscription = async (req, res) => {
   try {
     let { SubscriptionId, ShopId } = req.body;
-    const subscription  =await findSubscriptionByID(SubscriptionId)
+    const subscription  = await findSubscriptionByID(SubscriptionId)
     const response = await ShopSubscription.create({
       ShopId,
       SubscriptionId,
@@ -37,11 +37,7 @@ const getShopSubscriptions = async (req, res) => {
     const response = await ShopSubscription.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
+     
     });
     successResponse(res, {
       count: response.count,

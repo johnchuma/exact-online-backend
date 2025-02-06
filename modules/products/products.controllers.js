@@ -62,14 +62,17 @@ const addProduct = async (req, res) => {
 const getProducts = async (req, res) => {
   try {
     const { category } = req.query;
+    console.log(req.keyword)
     let filter = {
       name: {
-        [Op.like]: `%${req.keyword}%`,
+        [Op.like]: `%${req.keyword??""}%`,
       },
     };
     if (category && category != "All") {
       filter.CategoryId = category;
     }
+    console.log(filter)
+
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,

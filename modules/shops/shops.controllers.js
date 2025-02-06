@@ -56,7 +56,9 @@ const getShops = async (req, res) => {
         },
       },
       include: [ShopDocument, ShopFollower],
+    
     });
+
     successResponse(res, {
       count: response.count,
       page: req.page,
@@ -66,6 +68,7 @@ const getShops = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 
 const getUserShops = async (req, res) => {
   try {
@@ -145,6 +148,7 @@ const getShop = async (req, res) => {
       where: {
         id,
       },
+     
       attributes:{
         include: [
           [
@@ -166,6 +170,64 @@ const getShop = async (req, res) => {
             ),
             "followers", // Alias for the count of followers
           ],
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ProductStats"
+                JOIN "Products" ON "Products"."id" = "ProductStats"."ProductId"
+                WHERE "Products"."ShopId" = "Shop"."id"
+                AND "ProductStats"."type" = 'view'
+              )
+            `),
+            "impressions" 
+          ],
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ProductStats"
+                JOIN "Products" ON "Products"."id" = "ProductStats"."ProductId"
+                WHERE "Products"."ShopId" = "Shop"."id"
+                AND "ProductStats"."type" = 'share'
+              )
+            `),
+            "shares" 
+          ],
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ProductStats"
+                JOIN "Products" ON "Products"."id" = "ProductStats"."ProductId"
+                WHERE "Products"."ShopId" = "Shop"."id"
+                AND "ProductStats"."type" = 'call'
+              )
+            `),
+            "calls" 
+          ],
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ShopViews"
+                WHERE "ShopViews"."ShopId" = "Shop"."id"
+              )
+            `),
+            "profileViews" 
+          ],
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM "ReelStats"
+                JOIN "Reels" ON "Reels"."id" = "ReelStats"."ReelId"
+                WHERE "Reels"."ShopId" = "Shop"."id"
+                AND "ReelStats"."type" = 'like'
+              )
+            `),
+            "reelLikes"
+          ],          
         ],
       },
       include:[ShopCalender,{
