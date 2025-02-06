@@ -5,6 +5,7 @@ const {
   ShopSubscription,
   ShopDocument,
   ShopView,
+  Subscription,
   ShopFollower,
   Sequelize,
 } = require("../../models");
@@ -12,6 +13,7 @@ const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { Fn } = require("sequelize/lib/utils");
 const moment = require("moment");
+const { subscribe } = require("./shops.routes");
 
 const findShopByID = async (id) => {
   try {
@@ -232,6 +234,7 @@ const getShop = async (req, res) => {
       },
       include:[ShopCalender,{
         model:ShopSubscription,
+        include:[Subscription],
         where:{
           expireDate:{
             [Op.gt]:Date.now()
