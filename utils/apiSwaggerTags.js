@@ -28,6 +28,11 @@ const messagesTag = (req, res, next) => {
   next();
 };
 
+const notificationsTag = (req, res, next) => {
+  // #swagger.tags = ['Notifications']
+  next();
+};
+
 const productCategoriesTag = (req, res, next) => {
   // #swagger.tags = ['Product Categories']
   next();
@@ -127,6 +132,7 @@ module.exports = {
   categoriesTag,
   chatsTag,
   messagesTag,
+  notificationsTag,
   productCategoriesTag,
   productColorsTag,
   productImagesTag,
