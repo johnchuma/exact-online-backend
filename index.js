@@ -106,31 +106,7 @@ app.use(
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// const options = {
-//   key: fs.readFileSync("/etc/letsencrypt/live/api.exactonline.co.tz/privkey.pem"),
-//   cert: fs.readFileSync("/etc/letsencrypt/live/api.exactonline.co.tz/fullchain.pem"),
-// };
-const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: "*", // Allow all origins (Adjust in production)
-    methods: ["GET", "POST"],
-  },
-});
-io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
-  // Listen for incoming messages
-  socket.on("sendMessage", (data) => {
-    // console.log("Message received:", data);
-    console.log("Message received", data);
-    io.emit("receiveMessage", data); // Broadcast to all clients
-  });
-  // Handle user disconnect
-  socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
-  });
-});
 app.get("/", (req, res) => {
   try {
     res.send("Server is working fine");

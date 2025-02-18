@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      lastMessage: {
+        type: DataTypes.TEXT,
+        defaultValue:"Tap to start conversation"
+      },
     },
     {
       sequelize,
