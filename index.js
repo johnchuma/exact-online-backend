@@ -10,6 +10,7 @@ const CategoriesRoutes = require("./modules/categories/categories.routes");
 const CategoryProductSpecificationsRoutes = require("./modules/categoryProductSpecifications/categoryProductSpecifications.routes");
 const ChatsRoutes = require("./modules/chats/chats.routes");
 const MessagesRoutes = require("./modules/messages/messages.routes");
+const NotificationRoutes = require("./modules/notifications/notifications.routes");
 const ProductCategoriesRoutes = require("./modules/productCategories/productCategories.routes");
 const ProductColorsRoutes = require("./modules/productColors/productColors.routes");
 const ProductImagesRoutes = require("./modules/productImages/productImages.routes");
@@ -38,6 +39,7 @@ const {
   categoriesTag,
   chatsTag,
   messagesTag,
+  notificationsTag,
   productCategoriesTag,
   productColorsTag,
   productImagesTag,
@@ -74,6 +76,7 @@ app.use("/ads", adsTag, AdsRoutes);
 app.use("/categories", categoriesTag, CategoriesRoutes);
 app.use("/chats", chatsTag, ChatsRoutes);
 app.use("/messages", messagesTag, MessagesRoutes);
+app.use("/notifications", notificationsTag, NotificationRoutes);
 app.use("/product-categories", productCategoriesTag, ProductCategoriesRoutes);
 app.use("/product-colors", productColorsTag, ProductColorsRoutes);
 app.use("/product-images", productImagesTag, ProductImagesRoutes);
@@ -113,6 +116,6 @@ app.get("/", (req, res) => {
   } catch (error) {}
 });
 
-app.listen(5000, () => {
-  console.log("Server started at port 5000");
+app.listen(5001, () => {
+  console.log("Server started at port 5001");
 });
