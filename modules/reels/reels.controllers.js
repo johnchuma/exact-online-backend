@@ -96,7 +96,6 @@ const getShopReels = async (req, res) => {
         },
       ],
     });
-
     successResponse(res, {
       count: response.count,
       page: req.page,
@@ -178,6 +177,7 @@ const getReel = async (req, res) => {
       ],
       replacements: { userId: user.id }, // Passing user.id as a parameter
     });
+    
     successResponse(res, reel);
   } catch (error) {
     errorResponse(res, error);

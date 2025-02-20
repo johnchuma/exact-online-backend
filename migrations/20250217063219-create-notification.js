@@ -16,7 +16,7 @@ module.exports = {
       },
       message: {
         allowNull: false,
-        type: DataTypes.TEXT("long"),
+        type: DataTypes.TEXT,
       },
       image: {
         type: DataTypes.STRING,
@@ -32,11 +32,11 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     });
   },
