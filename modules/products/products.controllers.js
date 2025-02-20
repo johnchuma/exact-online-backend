@@ -6,6 +6,7 @@ const {
   OrderedProduct,
   ProductReview,
   Favorite,
+  User,
   Order,
   Shop,
 } = require("../../models");
@@ -19,7 +20,10 @@ const findProductByID = async (id) => {
       where: {
         id,
       },
-      include: [ProductImage, ProductStat, ProductReview,Shop],
+      include: [ProductImage, ProductStat, {
+        model:ProductReview,
+        include:[User]
+      },Shop],
     });
     return product;
   } catch (error) {
@@ -77,7 +81,7 @@ const getProducts = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: filter,
-      include: [ProductImage, ProductStat, ProductReview,{
+      include: [ProductImage,Shop, ProductStat, ProductReview,{
         model:Favorite,
         where:{
           UserId:req.user.id
@@ -104,7 +108,7 @@ const getNewArrivalProducts = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [ProductImage, ProductStat, ProductReview,{
+      include: [ProductImage,Shop, ProductStat, ProductReview,{
         model:Favorite,
         where:{
           UserId:req.user.id
@@ -231,7 +235,10 @@ const getProduct = async (req, res) => {
       where: {
         id,
       },
-      include: [ProductImage, ProductStat, ProductReview,Shop,{
+      include: [ProductImage, ProductStat, {
+        model:ProductReview,
+        include:[User]
+      },Shop,{
         model:Favorite,
         where:{
           UserId:req.user.id

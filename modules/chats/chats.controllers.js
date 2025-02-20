@@ -18,25 +18,29 @@ const findChatByID = async (id) => {
 const addChat = async (req, res) => {
   try {
     let { ShopId, UserId } = req.body;
-    let chat  = await Chat.findOne({
-      where:{
+    let chat = await Chat.findOne({
+      where: {
         ShopId,
-        UserId,
+        UserId
       },
-      include:[Shop,User]
-    })
-    if(!chat){
-      chat =  await Chat.create({
+      include: [Shop, User]
+    });
+
+    // If no chat was found, you can handle it by creating a new one (optional)
+    if (!chat) {
+      chat = await Chat.create({
         ShopId,
-        UserId,
+        UserId
       });
     }
+
     successResponse(res, chat);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
   }
 };
+
 const getChats = async (req, res) => {
   try {
     const response = await Chat.findAndCountAll({
@@ -58,9 +62,11 @@ const getUserChats = async (req, res) => {
     const response = await Chat.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
+      order:[["updatedAt","DESC"]],
       where: {
         UserId: id,
       },
+      include:[Shop,User]
     });
     successResponse(res, {
       count: response.count,
@@ -73,13 +79,16 @@ const getUserChats = async (req, res) => {
 };
 const getShopChats = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
+    console.log(id)
     const response = await Chat.findAndCountAll({
+      order:[["updatedAt","DESC"]],
       limit: req.limit,
       offset: req.offset,
       where: {
         ShopId: id,
       },
+      include:[User,Shop]
     });
     successResponse(res, {
       count: response.count,

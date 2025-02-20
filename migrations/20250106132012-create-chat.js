@@ -17,6 +17,10 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      lastMessage: {
+        type: DataTypes.TEXT,
+        defaultValue:"Tap to start conversation"
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
