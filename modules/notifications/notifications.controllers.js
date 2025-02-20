@@ -18,12 +18,10 @@ const findNotificationByID = async (id) => {
 };
 const addNotification = async (req, res) => {
   try {
-    let { title, UserId, isRead, message } = req.body;
+    let { title, message } = req.body;
     const image = await getUrl(req);
     const response = await Notification.create({
       title,
-      UserId,
-      isRead,
       message,
       image,
     });
@@ -39,7 +37,6 @@ const getNotifications = async (req, res) => {
       const response = await Notification.findAndCountAll({
         limit: req.limit,
         offset: req.offset,
-        include: [User, Shop],
       });
       successResponse(res, {
         count: response.count,
