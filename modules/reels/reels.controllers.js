@@ -110,6 +110,7 @@ const getReel = async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.user;
+    console.log(user)
     const reel = await Reel.findOne({
       where: {
         id,
@@ -119,6 +120,7 @@ const getReel = async (req, res) => {
         model:ReelStat,
         where: {
           UserId: user.id,
+          type:'like'
         },
         required:false
        },
@@ -154,6 +156,7 @@ const getReel = async (req, res) => {
                     SELECT 1
                     FROM "ReelStats"
                     WHERE "ReelStats"."UserId" = :userId
+                    AND "ReelStats"."ReelId" = "Reel"."id"
                     AND "ReelStats"."type" = 'like'
                   ))`
                 ),

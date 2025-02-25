@@ -67,6 +67,8 @@ const findOrderProductsByUser = async (req, res) => {
           },
           required:false
         }],
+        required:true
+        
       }],
     });
     successResponse(res, {

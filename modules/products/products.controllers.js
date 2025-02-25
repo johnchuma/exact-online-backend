@@ -108,6 +108,7 @@ const getNewArrivalProducts = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
+      order:[["createdAt","DESC"]],
       include: [ProductImage,Shop, ProductStat, ProductReview,{
         model:Favorite,
         where:{
@@ -152,7 +153,7 @@ const getProductsForYou = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [ProductImage, ProductStat, ProductReview,{
+      include: [ProductImage,Shop, ProductStat, ProductReview,{
         model:Favorite,
         where:{
           UserId:req.user.id

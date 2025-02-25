@@ -27,6 +27,7 @@ const ShopsSubscriptionsRoutes = require("./modules/shopSubscriptions/shopSubscr
 const ShopViewRoutes = require("./modules/shopViews/shopViews.routes");
 const SubscriptionRoutes = require("./modules/subscriptions/subscriptions.routes");
 const UserRoutes = require("./modules/users/users.routes");
+const BannerRoutes = require("./modules/banners/banners.routes");
 const FavoritesRoutes = require("./modules/favorites/favorites.routes");
 const ShopFollowersRoutes = require("./modules/shopFollowers/shopFollowers.routes");
 const OrdersRoutes = require("./modules/orders/orders.routes");
@@ -61,8 +62,10 @@ const {
   shopFollowersTag,
   favoritesTag,
   reelStatsTag,
+  bannersTag,
 } = require("./utils/apiSwaggerTags");
 const { Server } = require("socket.io");
+const { errorResponse } = require("./utils/responses");
 // const responseTime = require("express-response-time");
 // app.use(responseTime());
 app.use("/files", express.static("files"));
@@ -92,6 +95,7 @@ app.use("/shop-followers", shopFollowersTag, ShopFollowersRoutes);
 app.use("/shops", shopsTag, ShopsRoutes);
 app.use("/favorites", favoritesTag, FavoritesRoutes);
 app.use("/orders", ordersTag, OrdersRoutes);
+app.use("/banners", bannersTag, BannerRoutes);
 app.use("/ordered-products", orderedProductsTag, OrderedProductsRoutes);
 app.use(
   "/shops-subscriptions",
@@ -109,12 +113,18 @@ app.use(
 
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 app.get("/", (req, res) => {
   try {
     res.send("Server is working fine");
   } catch (error) {}
 });
+app.get("/open-app",(req,res)=>{
+  try {
+    res.redirect("https://play.google.com/store/apps/details?id=com.exactmanpower.e_online")
+  } catch (error) {
+    errorResponse(res,error)
+  }
+})
 
 app.listen(5000, () => {
   console.log("Server started at port 5001");
