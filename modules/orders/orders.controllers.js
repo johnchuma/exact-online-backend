@@ -60,19 +60,28 @@ const getUserOrders = async (req, res) => {
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
+      order:[["updatedAt","DESC"]],
       where: {
         UserId: id,
-        status:{
-          [Op.not]:"ON CART"
+        status: {
+          [Op.not]: "ON CART"
         },
       },
-      include: [{
-        model:OrderedProduct,
-        include:[{
-          model:Product,
-          include:[Shop]
-        }]
-      }, User],
+      include: [
+        {
+          model: OrderedProduct,
+          include: [
+            {
+              required:true,
+              model: Product,
+              include: [Shop],
+            },
+          ],
+        },
+        {
+          model: User,
+        },
+      ],
     });
     successResponse(res, {
       count: response.count,
@@ -80,8 +89,7 @@ const getUserOrders = async (req, res) => {
       ...response,
     });
   } catch (e) {
-    errorResponse(res, error);
-
+    errorResponse(res, e); // Pass the error object directly
   }
 };
 const getShopOrders = async (req, res) => {
@@ -90,6 +98,7 @@ const getShopOrders = async (req, res) => {
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
+      order:[["updatedAt","DESC"]],
       where: {
         status:{
           [Op.not]:"ON CART"
@@ -102,6 +111,7 @@ const getShopOrders = async (req, res) => {
           where:{
             ShopId:id
           },
+          include:[Shop],
           required:true
         }]
       },User],
