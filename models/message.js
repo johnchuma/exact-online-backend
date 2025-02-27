@@ -9,9 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Message.belongsTo(models.Chat);
-      Message.belongsTo(models.Order);
-      Message.belongsTo(models.Product);
+      Message.belongsTo(models.Topic);
+      Message.belongsTo(models.User);
+      Message.belongsTo(models.Message);
     }
   }
   Message.init(
@@ -22,31 +22,40 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
+      TopicId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      from: {
+        type: DataTypes.ENUM("user", "shop"),
+        allowNull: false,
+      },
+      UserId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       message: {
-        type: DataTypes.TEXT("long"),
-        allowNull: false,
+        type: DataTypes.TEXT,
+        allowNull: true, // Can be null if message type is "image"
       },
-      image: {
+      type: {
+        type: DataTypes.ENUM("normal", "reply", "image"),
+        allowNull: false,
+        defaultValue: "normal",
+      },
+      MessageId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
+      imageUrl: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true, // Only applicable when type is "image"
       },
-      sentBy: {
-        type: DataTypes.ENUM("Shop","User"),
+      delivered: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
+        defaultValue: false,
       },
-      ChatId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
-      OrderId: {
-        type: DataTypes.UUID,
-        allowNull: true,
-      },
-      ProductId: {
-        type: DataTypes.UUID,
-        allowNull: true,
-      },
-     
     },
     {
       sequelize,

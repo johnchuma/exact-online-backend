@@ -4,11 +4,13 @@ const http = require("http");
 const bodyParser = require("body-parser");
 const app = express();
 const fs = require("fs");
+const { Server } = require("socket.io");
 const AdDimensionsRoutes = require("./modules/adDimensions/adDimensions.routes");
 const AdsRoutes = require("./modules/ads/ads.routes");
 const CategoriesRoutes = require("./modules/categories/categories.routes");
 const CategoryProductSpecificationsRoutes = require("./modules/categoryProductSpecifications/categoryProductSpecifications.routes");
 const ChatsRoutes = require("./modules/chats/chats.routes");
+const TopicsRoutes = require("./modules/topics/topics.routes");
 const MessagesRoutes = require("./modules/messages/messages.routes");
 const NotificationRoutes = require("./modules/notifications/notifications.routes");
 const ProductCategoriesRoutes = require("./modules/productCategories/productCategories.routes");
@@ -63,21 +65,32 @@ const {
   favoritesTag,
   reelStatsTag,
   bannersTag,
+  topicsTag,
 } = require("./utils/apiSwaggerTags");
-const { Server } = require("socket.io");
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Adjust based on frontend URL
+  },
+});
 const { errorResponse } = require("./utils/responses");
-// const responseTime = require("express-response-time");
-// app.use(responseTime());
 app.use("/files", express.static("files"));
 app.use("/extracted", express.static("extracted"));
 app.use(express.json());
 app.use(cors());
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 app.use(bodyParser.text({ type: "text/plain" }));
+
 //routes
 app.use("/ad-dimensions", adDimensionsTag, AdDimensionsRoutes);
 app.use("/ads", adsTag, AdsRoutes);
 app.use("/categories", categoriesTag, CategoriesRoutes);
 app.use("/chats", chatsTag, ChatsRoutes);
+app.use("/topics", topicsTag, TopicsRoutes);
 app.use("/messages", messagesTag, MessagesRoutes);
 app.use("/notifications", notificationsTag, NotificationRoutes);
 app.use("/product-categories", productCategoriesTag, ProductCategoriesRoutes);
@@ -111,21 +124,29 @@ app.use(
   CategoryProductSpecificationsRoutes
 );
 
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req, res) => {
   try {
     res.send("Server is working fine");
   } catch (error) {}
 });
-app.get("/open-app",(req,res)=>{
+app.get("/open-app", (req, res) => {
   try {
-    res.redirect("https://play.google.com/store/apps/details?id=com.exactmanpower.e_online")
+    res.redirect(
+      "https://play.google.com/store/apps/details?id=com.exactmanpower.e_online"
+    );
   } catch (error) {
-    errorResponse(res,error)
+    errorResponse(res, error);
   }
-})
+});
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 app.listen(5000, () => {
-  console.log("Server started at port 5001");
+  console.log("Server started at port 5000");
 });

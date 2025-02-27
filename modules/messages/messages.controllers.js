@@ -18,32 +18,30 @@ const findMessageByID = async (id) => {
 };
 const addMessage = async (req, res) => {
   try {
-    let { ChatId, UserId, ShopId, message } = req.body;
-    const image = await getUrl(req);
-    const response = await Message.create({
-      ChatId,
+    let { TopicId, UserId, from, message, imageUrl, type } = req.body;
+    const savedMessage = await Message.create({
+      TopicId,
       UserId,
-      ShopId,
+      from,
       message,
-      image,
+      imageUrl,
+      type,
     });
+    req.io.emit("receiveMessage", savedMessage);
     successResponse(res, response);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
   }
 };
-const getChatMessages = async (req, res) => {
+const getTopicMessages = async (req, res) => {
   try {
     const { id } = req.params;
     const response = await Message.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
-        message: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-        ChatId: id,
+        TopicId: id,
       },
     });
     successResponse(res, {
@@ -55,26 +53,7 @@ const getChatMessages = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const getMessages = async (req, res) => {
-  try {
-    const response = await Message.findAndCountAll({
-      limit: req.limit,
-      offset: req.offset,
-      where: {
-        message: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
-    });
-    successResponse(res, {
-      count: response.count,
-      page: req.page,
-      ...response,
-    });
-  } catch (error) {
-    errorResponse(res, error);
-  }
-};
+
 const getMessage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -88,6 +67,7 @@ const updateMessage = async (req, res) => {
   try {
     const { id } = req.params;
     const message = await findMessageByID(id);
+
     const response = await message.update({
       ...req.body,
     });
@@ -109,10 +89,9 @@ const deleteMessage = async (req, res) => {
 
 module.exports = {
   findMessageByID,
-  getMessages,
   addMessage,
   deleteMessage,
-  getChatMessages,
+  getTopicMessages,
   addMessage,
   getMessage,
   updateMessage,
