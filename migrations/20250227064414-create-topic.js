@@ -2,20 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("Chats", {
+    await queryInterface.createTable("Topics", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      UserId: {
-        type: DataTypes.UUID,
+      ChatId: {
         allowNull: false,
+        type: DataTypes.STRING,
       },
-      ShopId: {
-        type: DataTypes.UUID,
+      ProductId: {
         allowNull: false,
+        type: DataTypes.STRING,
+      },
+      OrderId: {
+        allowNull: false,
+        type: DataTypes.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable("Chats");
+    await queryInterface.dropTable("Topics");
   },
 };

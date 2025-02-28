@@ -23,6 +23,11 @@ const chatsTag = (req, res, next) => {
   next();
 };
 
+const topicsTag = (req, res, next) => {
+  // #swagger.tags = ['Topics']
+  next();
+};
+
 const messagesTag = (req, res, next) => {
   // #swagger.tags = ['Messages']
   next();
@@ -148,6 +153,7 @@ module.exports = {
   reelsTag,
   shopCalendersTag,
   shopDocumentsTag,
+  topicsTag,
   shopsTag,
   shopsSubscriptionsTag,
   shopViewsTag,
@@ -157,5 +163,5 @@ module.exports = {
   ordersTag,
   orderedProductsTag,
   favoritesTag,
-  bannersTag
+  bannersTag,
 };
