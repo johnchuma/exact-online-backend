@@ -28,7 +28,7 @@ const addMessage = async (req, res) => {
       type,
     });
     req.io.emit("receiveMessage", savedMessage);
-    successResponse(res, response);
+    successResponse(res, savedMessage);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
@@ -37,18 +37,12 @@ const addMessage = async (req, res) => {
 const getTopicMessages = async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await Message.findAndCountAll({
-      limit: req.limit,
-      offset: req.offset,
+    const response = await Message.findAll({
       where: {
         TopicId: id,
       },
     });
-    successResponse(res, {
-      count: response.count,
-      page: req.page,
-      ...response,
-    });
+    successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
   }

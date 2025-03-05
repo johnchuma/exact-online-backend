@@ -4,6 +4,7 @@ const {
   ProductImage,
   ProductStat,
   OrderedProduct,
+  CartProduct,
   ProductReview,
   Favorite,
   User,
@@ -236,7 +237,15 @@ const getProduct = async (req, res) => {
       where: {
         id,
       },
-      include: [ProductImage, ProductStat, {
+      include: [
+        {
+          model:CartProduct,
+          where:{
+            UserId:req.user.id
+          },
+          required:false
+        },
+        ProductImage, ProductStat, {
         model:ProductReview,
         include:[User]
       },Shop,{
@@ -246,18 +255,11 @@ const getProduct = async (req, res) => {
         },
         required:false
 
-      },{
-        model:OrderedProduct,
-        include:[{
-          model:Order,
-          where:{
-            status:"ON CART"
-          }
-        }]
       }],
     });
     successResponse(res, product);
   } catch (error) {
+    console.log(error)
     errorResponse(res, error);
   }
 };

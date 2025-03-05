@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Chat,Shop,User } = require("../../models");
+const { Chat,Shop,User,Topic,Message, Sequelize } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 
 const findChatByID = async (id) => {
@@ -8,6 +8,7 @@ const findChatByID = async (id) => {
       where: {
         id,
       },
+      include: [Shop, User]
     });
     return chat;
   } catch (error) {
@@ -15,9 +16,10 @@ const findChatByID = async (id) => {
     throw error;
   }
 };
-const addChat = async (req, res) => {
+const addChat = async (req, res,next) => {
   try {
     let { ShopId, UserId } = req.body;
+
     let chat = await Chat.findOne({
       where: {
         ShopId,
@@ -32,9 +34,11 @@ const addChat = async (req, res) => {
         ShopId,
         UserId
       });
+      chat = await findChatByID(chat.id)
     }
-
-    successResponse(res, chat);
+    req.body.ChatId = chat.id
+    next()
+ 
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
@@ -62,21 +66,55 @@ const getUserChats = async (req, res) => {
     const response = await Chat.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      order:[["updatedAt","DESC"]],
+      order: [["updatedAt", "DESC"]],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
+              SELECT "message"
+              FROM "Messages"
+              WHERE "Messages"."TopicId" IN (
+                SELECT "id"
+                FROM "Topics"
+                WHERE "Topics"."ChatId" = "Chat"."id"
+              )
+              ORDER BY "Messages"."createdAt" DESC
+              LIMIT 1
+            )`),
+            "lastMessage",
+          ],
+        ],
+      },
       where: {
         UserId: id,
       },
-      include:[Shop,User]
+      include: [
+        { model: Shop },
+        { model: User },
+        {
+          model: Topic,
+          include: [
+            {
+              model: Message,
+              limit: 1,
+              order: [["createdAt", "DESC"]],
+              attributes: ["message"],
+            },
+          ],
+        },
+      ],
     });
+
     successResponse(res, {
       count: response.count,
       page: req.page,
-      ...response,
+      rows: response.rows,
     });
   } catch (error) {
     errorResponse(res, error);
   }
 };
+
 const getShopChats = async (req, res) => {
   try {
     const { id } = req.params;
@@ -88,7 +126,35 @@ const getShopChats = async (req, res) => {
       where: {
         ShopId: id,
       },
-      include:[User,Shop]
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
+              SELECT "message"
+              FROM "Messages"
+              WHERE "Messages"."TopicId" IN (
+                SELECT "id"
+                FROM "Topics"
+                WHERE "Topics"."ChatId" = "Chat"."id"
+              )
+              ORDER BY "Messages"."createdAt" DESC
+              LIMIT 1
+            )`),
+            "lastMessage",
+          ],
+        ],
+      },
+      include:[User,Shop,{
+        model: Topic,
+        include: [
+          {
+            model: Message,
+            limit: 1,
+            order: [["createdAt", "DESC"]],
+            attributes: ["message"],
+          },
+        ],
+      },]
     });
     successResponse(res, {
       count: response.count,

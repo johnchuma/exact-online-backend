@@ -27,7 +27,6 @@ module.exports = {
       },
       type: {
         type: DataTypes.ENUM("normal", "reply", "image"),
-        allowNull: false,
         defaultValue: "normal",
       },
       MessageId: {

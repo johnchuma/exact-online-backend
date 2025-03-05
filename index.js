@@ -29,6 +29,7 @@ const ShopsSubscriptionsRoutes = require("./modules/shopSubscriptions/shopSubscr
 const ShopViewRoutes = require("./modules/shopViews/shopViews.routes");
 const SubscriptionRoutes = require("./modules/subscriptions/subscriptions.routes");
 const UserRoutes = require("./modules/users/users.routes");
+const CartProductsRoutes = require("./modules/cartProducts/cartProducts.routes");
 const BannerRoutes = require("./modules/banners/banners.routes");
 const FavoritesRoutes = require("./modules/favorites/favorites.routes");
 const ShopFollowersRoutes = require("./modules/shopFollowers/shopFollowers.routes");
@@ -78,6 +79,7 @@ app.use("/files", express.static("files"));
 app.use("/extracted", express.static("extracted"));
 app.use(express.json());
 app.use(cors());
+
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -108,6 +110,7 @@ app.use("/shop-followers", shopFollowersTag, ShopFollowersRoutes);
 app.use("/shops", shopsTag, ShopsRoutes);
 app.use("/favorites", favoritesTag, FavoritesRoutes);
 app.use("/orders", ordersTag, OrdersRoutes);
+app.use("/cart-products", ordersTag, CartProductsRoutes);
 app.use("/banners", bannersTag, BannerRoutes);
 app.use("/ordered-products", orderedProductsTag, OrderedProductsRoutes);
 app.use(
@@ -123,7 +126,6 @@ app.use(
   categoryProductSpecificationsTag,
   CategoryProductSpecificationsRoutes
 );
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req, res) => {
   try {
@@ -147,6 +149,6 @@ io.on("connection", (socket) => {
   });
 });
 
-app.listen(5000, () => {
+server.listen(5000, () => {
   console.log("Server started at port 5000");
 });

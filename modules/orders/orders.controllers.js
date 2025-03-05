@@ -20,19 +20,12 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    let order = await Order.findOne({
-      where:{
-        UserId:req.user.id,
-        status:"ON CART"
-      }
-    })
-    if(!order){
-      order = await Order.create({
-        UserId:req.user.id,
+    const {ShopId,UserId} = req.body;
+    const response = await Order.create({
+       ShopId,UserId
       });
-    }
     
-    successResponse(res, order);
+    successResponse(res, response);
   } catch (error) {
     console.log(error);
     errorResponse(res, error);
@@ -63,9 +56,7 @@ const getUserOrders = async (req, res) => {
       order:[["updatedAt","DESC"]],
       where: {
         UserId: id,
-        status: {
-          [Op.not]: "ON CART"
-        },
+        
       },
       include: [
         {
@@ -80,6 +71,9 @@ const getUserOrders = async (req, res) => {
         },
         {
           model: User,
+        },
+        {
+          model: Shop,
         },
       ],
     });
@@ -99,11 +93,7 @@ const getShopOrders = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       order:[["updatedAt","DESC"]],
-      where: {
-        status:{
-          [Op.not]:"ON CART"
-        },
-      },
+     
       include: [{
         model:OrderedProduct,
         include:[{

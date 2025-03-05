@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Chat.belongsTo(models.User);
       Chat.belongsTo(models.Shop);
+      Chat.hasMany(models.Topic)
     }
   }
   Chat.init(
@@ -29,10 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      lastMessage: {
-        type: DataTypes.TEXT,
-        defaultValue: "Tap to start conversation",
-      },
+    
     },
     {
       sequelize,

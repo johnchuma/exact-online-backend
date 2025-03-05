@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Order.belongsTo(models.User);
+      Order.belongsTo(models.Shop);
       Order.hasMany(models.OrderedProduct,{
         onDelete: "CASCADE",
         scope: true,
@@ -28,9 +29,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      ShopId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       status: {
         type: DataTypes.STRING,
-        defaultValue: "ON CART",
+        defaultValue: "PENDING",
       },
     },
     {

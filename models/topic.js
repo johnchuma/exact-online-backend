@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Topic.belongsTo(models.Chat)
+      Topic.belongsTo(models.Product)
+      Topic.belongsTo(models.Order)
+      Topic.hasMany(models.Message)
     }
   }
   Topic.init(
@@ -21,15 +25,15 @@ module.exports = (sequelize, DataTypes) => {
       },
       ChatId: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
       },
       ProductId: {
-        allowNull: false,
-        type: DataTypes.STRING,
+        allowNull: true,
+        type: DataTypes.UUID,
       },
       OrderId: {
-        allowNull: false,
-        type: DataTypes.STRING,
+        allowNull: true,
+        type: DataTypes.UUID,
       },
     },
     {

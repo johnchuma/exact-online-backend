@@ -13,9 +13,13 @@ module.exports = {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      ShopId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       status: {
         type: DataTypes.STRING,
-        defaultValue: "ON CART",
+        defaultValue: "PENDING",
       },
       createdAt: {
         allowNull: false,

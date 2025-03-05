@@ -10,9 +10,10 @@ const {
   getUserChats,
 } = require("./chats.controllers");
 const { getPagination } = require("../../utils/getPagination");
+const { addTopic } = require("../topics/topics.controllers");
 const router = Router();
 
-router.post("/", validateJWT, addChat);
+router.post("/", validateJWT, addChat,addTopic);
 router.get("/", validateJWT, getPagination, getChats);
 router.get("/shop/:id", validateJWT, getPagination, getShopChats);
 router.get("/user/:id", validateJWT, getPagination, getUserChats);

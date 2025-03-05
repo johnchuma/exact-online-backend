@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Message.belongsTo(models.Topic);
       Message.belongsTo(models.User);
       Message.belongsTo(models.Message);
+    
     }
   }
   Message.init(
@@ -40,7 +41,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       type: {
         type: DataTypes.ENUM("normal", "reply", "image"),
-        allowNull: false,
         defaultValue: "normal",
       },
       MessageId: {
