@@ -46,6 +46,7 @@ const addProduct = async (req, res) => {
       CategoryId,
       ShopId,
     } = req.body;
+    console.log(description);
     const response = await Product.create({
       name,
       sellingPrice,

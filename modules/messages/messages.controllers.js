@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Message } = require("../../models");
+const { Message,Topic,Chat } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -38,6 +38,7 @@ const getTopicMessages = async (req, res) => {
   try {
     const { id } = req.params;
     const response = await Message.findAll({
+      order:[["createdAt"]],
       where: {
         TopicId: id,
       },
@@ -70,6 +71,90 @@ const updateMessage = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const markAsReadShopMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find messages with the required associations
+    const messages = await Message.findAll({
+      include: [
+        {
+          model: Topic,
+          include: [
+            {
+              model: Chat,
+              where: { ShopId: id },
+              required: true,
+            },
+          ],
+          required: true,
+        },
+      ],
+    });
+
+    if (messages.length === 0) {
+      return res.status(404).json({ message: "No messages found for this shop." });
+    }
+
+    // Update messages after finding them
+    await Message.update(
+      { delivered: true },
+      {
+        where: {
+          id: messages.map((msg) => msg.id), // Update only found message IDs
+        },
+      }
+    );
+
+    successResponse(res, { message: "Messages marked as read." });
+  } catch (error) {
+    console.error("Error updating messages:", error);
+    errorResponse(res, error);
+  }
+};
+
+const markAsReadUserMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find messages related to the user
+    const messages = await Message.findAll({
+      include: [
+        {
+          model: Topic,
+          include: [
+            {
+              model: Chat,
+              where: { UserId: id },
+              required: true,
+            },
+          ],
+          required: true,
+        },
+      ],
+    });
+
+    if (messages.length === 0) {
+      return res.status(404).json({ message: "No messages found for this user." });
+    }
+
+    // Extract message IDs and update them
+    await Message.update(
+      { delivered: true },
+      {
+        where: {
+          id: messages.map((msg) => msg.id), // Only update found messages
+        },
+      }
+    );
+
+    successResponse(res, { message: "Messages marked as read." });
+  } catch (error) {
+    console.error("Error updating messages:", error);
+    errorResponse(res, error);
+  }
+};
+
 const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,6 +172,8 @@ module.exports = {
   deleteMessage,
   getTopicMessages,
   addMessage,
+  markAsReadShopMessage,
+  markAsReadUserMessage,
   getMessage,
   updateMessage,
 };

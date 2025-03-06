@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      totalPrice:{
+        type: DataTypes.DOUBLE,
+        defaultValue:0
+      },
       status: {
         type: DataTypes.STRING,
         defaultValue: "PENDING",

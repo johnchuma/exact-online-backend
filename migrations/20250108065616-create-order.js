@@ -21,6 +21,10 @@ module.exports = {
         type: DataTypes.STRING,
         defaultValue: "PENDING",
       },
+      totalPrice:{
+        type: DataTypes.DOUBLE,
+        defaultValue:0
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

@@ -3,6 +3,7 @@ const { Shop, User, OrderedProduct,Order,Product } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getUserChats } = require("../chats/chats.controllers");
+const sendSMS = require("../../utils/send_sms");
 
 const findOrderByID = async (id) => {
   try {
@@ -20,11 +21,28 @@ const findOrderByID = async (id) => {
 };
 const addOrder = async (req, res) => {
   try {
-    const {ShopId,UserId} = req.body;
+    const {ShopId,UserId,status,totalPrice} = req.body;
+
     const response = await Order.create({
-       ShopId,UserId
+       ShopId,UserId,status,totalPrice
       });
-    
+      const shop = await Shop.findOne({
+        where:{
+          id:ShopId
+        },
+        include:[User]
+      })
+      const from = await User.findOne({
+        where:{
+          id:UserId
+        },
+      })
+      await sendSMS(
+        shop.phone,
+        `Dear ${shop.User.name},\nYou have a new order in your shop, ${shop.name} from ${from.name}. Open the app to view it.\n\nThank you.`
+      );
+            
+    console.log(response)
     successResponse(res, response);
   } catch (error) {
     console.log(error);

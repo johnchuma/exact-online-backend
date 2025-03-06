@@ -66,9 +66,26 @@ const getUserChats = async (req, res) => {
     const response = await Chat.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      order: [["updatedAt", "DESC"]],
+      order: [
+        // Reference the alias defined in attributes
+        [Sequelize.col('"lastMessageDatetime"'), 'DESC', 'NULLS LAST'],
+      ],
       attributes: {
         include: [
+          [
+            Sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM "Messages"
+              WHERE "Messages"."TopicId" IN (
+                SELECT "id"
+                FROM "Topics"
+                WHERE "Topics"."ChatId" = "Chat"."id"
+              )
+              AND "Messages"."delivered" = false
+              AND "Messages"."from" = 'shop'
+            )`),
+            "unreadMessages",
+          ],
           [
             Sequelize.literal(`(
               SELECT "message"
@@ -82,6 +99,20 @@ const getUserChats = async (req, res) => {
               LIMIT 1
             )`),
             "lastMessage",
+          ],
+          [
+            Sequelize.literal(`(
+              SELECT "createdAt"
+              FROM "Messages"
+              WHERE "Messages"."TopicId" IN (
+                SELECT "id"
+                FROM "Topics"
+                WHERE "Topics"."ChatId" = "Chat"."id"
+              )
+              ORDER BY "Messages"."createdAt" DESC
+              LIMIT 1
+            )`),
+            "lastMessageDatetime",
           ],
         ],
       },
@@ -118,9 +149,12 @@ const getUserChats = async (req, res) => {
 const getShopChats = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
     const response = await Chat.findAndCountAll({
-      order:[["updatedAt","DESC"]],
+      order: [
+        // Reference the alias defined in attributes
+        [Sequelize.col('"lastMessageDatetime"'), 'DESC', 'NULLS LAST'],
+      ],
       limit: req.limit,
       offset: req.offset,
       where: {
@@ -128,6 +162,20 @@ const getShopChats = async (req, res) => {
       },
       attributes: {
         include: [
+          [
+            Sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM "Messages"
+              WHERE "Messages"."TopicId" IN (
+                SELECT "id"
+                FROM "Topics"
+                WHERE "Topics"."ChatId" = "Chat"."id"
+              )
+              AND "Messages"."delivered" = false
+              AND "Messages"."from" = 'user'
+            )`),
+            "unreadMessages",
+          ],
           [
             Sequelize.literal(`(
               SELECT "message"
@@ -142,20 +190,39 @@ const getShopChats = async (req, res) => {
             )`),
             "lastMessage",
           ],
+          [
+            Sequelize.literal(`(
+              SELECT "createdAt"
+              FROM "Messages"
+              WHERE "Messages"."TopicId" IN (
+                SELECT "id"
+                FROM "Topics"
+                WHERE "Topics"."ChatId" = "Chat"."id"
+              )
+              ORDER BY "Messages"."createdAt" DESC
+              LIMIT 1
+            )`),
+            "lastMessageDatetime",
+          ],
         ],
       },
-      include:[User,Shop,{
-        model: Topic,
-        include: [
-          {
-            model: Message,
-            limit: 1,
-            order: [["createdAt", "DESC"]],
-            attributes: ["message"],
-          },
-        ],
-      },]
+      include: [
+        User,
+        Shop,
+        {
+          model: Topic,
+          include: [
+            {
+              model: Message,
+              limit: 1,
+              order: [["createdAt", "DESC"]],
+              attributes: ["message"],
+            },
+          ],
+        },
+      ],
     });
+
     successResponse(res, {
       count: response.count,
       page: req.page,

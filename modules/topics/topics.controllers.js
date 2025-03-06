@@ -5,6 +5,7 @@ const {
   Product,
   ProductImage,
   Message,
+  Chat,
   Order,
   Sequelize,
 } = require("../../models");
@@ -49,6 +50,12 @@ const addTopic = async (req, res) => {
         ProductId,
       })
     }
+     topic = await Topic.findOne({
+      where: options,
+      include:[{
+        model:Chat
+      }]
+    })
     successResponse(res, topic);
   } catch (error) {
     console.log(error);
@@ -77,6 +84,16 @@ const getTopics = async (req, res) => {
             )`),
             'lastMessage'
           ],
+          [
+            Sequelize.literal(`(
+              SELECT "createdAt"
+              FROM "Messages"
+              WHERE "Messages"."TopicId" = "Topic"."id"
+              ORDER BY "Messages"."createdAt" DESC
+              LIMIT 1
+            )`),
+            'lastMessageDatetime'
+          ],
         ],
       },
       include: [{
@@ -93,6 +110,8 @@ const getTopics = async (req, res) => {
         include: [ProductImage],
       }, {
         model: Message
+      },{
+        model:Chat
       }]
     });
     successResponse(res, {
