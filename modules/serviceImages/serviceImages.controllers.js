@@ -1,28 +1,27 @@
 const { Op } = require("sequelize");
-const { Category, CategoryProductSpecification } = require("../../models");
+const { ServiceImage } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
-const findCategoryByID = async (id) => {
+const findServiceImageByID = async (id) => {
   try {
-    const category = await Category.findOne({
+    const serviceimage = await ServiceImage.findOne({
       where: {
         id,
       },
     });
-    return category;
+    return serviceimage;
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
-const addCategory = async (req, res) => {
+const addServiceImage = async (req, res) => {
   try {
-    let { name, category } = req.body;
+    let { ServiceId } = req.body;
     const image = await getUrl(req);
-    const response = await Category.create({
-      name,
-      category,
+    const response = await ServiceImage.create({
+      ServiceId,
       image,
     });
     successResponse(res, response);
@@ -31,9 +30,9 @@ const addCategory = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const getCategories = async (req, res) => {
+const getServiceImages = async (req, res) => {
   try {
-    const response = await Category.findAndCountAll({
+    const response = await ServiceImage.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
@@ -41,7 +40,6 @@ const getCategories = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [CategoryProductSpecification],
     });
     successResponse(res, {
       count: response.count,
@@ -52,50 +50,45 @@ const getCategories = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const getCategory = async (req, res) => {
+
+const getServiceImage = async (req, res) => {
   try {
     const { id } = req.params;
-    const category = await findCategoryByID(id);
-    successResponse(res, category);
+    const serviceimage = await findServiceImageByID(id);
+    successResponse(res, serviceimage);
   } catch (error) {
     errorResponse(res, error);
   }
 };
-const updateCategory = async (req, res) => {
+const updateServiceImage = async (req, res) => {
   try {
     const { id } = req.params;
-    const category = await findCategoryByID(id);
-    const image = await getUrl(req);
-    console.log(req.body);
-    console.log(image);
-    if (image != null) {
-      req.body.image = image;
-    }
-    const response = await category.update({
+    const serviceimage = await findServiceImageByID(id);
+    const response = await serviceimage.update({
       ...req.body,
     });
-    console.log(req.body);
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
   }
 };
-const deleteCategory = async (req, res) => {
+const deleteServiceImage = async (req, res) => {
   try {
     const { id } = req.params;
-    const category = await findCategoryByID(id);
-    const response = await category.destroy();
+    const serviceimage = await findServiceImageByID(id);
+    const response = await serviceimage.destroy();
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
   }
 };
+
 module.exports = {
-  findCategoryByID,
-  getCategories,
-  addCategory,
-  deleteCategory,
-  addCategory,
-  getCategory,
-  updateCategory,
+  findServiceImageByID,
+  getServiceImages,
+  addServiceImage,
+  deleteServiceImage,
+  addServiceImage,
+  getServiceImage,
+  updateServiceImage,
 };

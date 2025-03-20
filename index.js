@@ -34,6 +34,8 @@ const BannerRoutes = require("./modules/banners/banners.routes");
 const FavoritesRoutes = require("./modules/favorites/favorites.routes");
 const ShopFollowersRoutes = require("./modules/shopFollowers/shopFollowers.routes");
 const OrdersRoutes = require("./modules/orders/orders.routes");
+const ServicesRoutes = require("./modules/services/services.routes");
+const ServiceImagesRoutes = require("./modules/serviceImages/serviceImages.routes");
 const OrderedProductsRoutes = require("./modules/orderedProducts/orderedProducts.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
@@ -67,6 +69,8 @@ const {
   reelStatsTag,
   bannersTag,
   topicsTag,
+  servicesTag,
+  serviceImagesTag,
 } = require("./utils/apiSwaggerTags");
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -108,6 +112,8 @@ app.use("/shop-calenders", shopCalendersTag, ShopCalendersRoutes);
 app.use("/shop-documents", shopDocumentsTag, ShopDocumentsRoutes);
 app.use("/shop-followers", shopFollowersTag, ShopFollowersRoutes);
 app.use("/shops", shopsTag, ShopsRoutes);
+app.use("/services", servicesTag, ServicesRoutes);
+app.use("/service-images", serviceImagesTag, ServiceImagesRoutes);
 app.use("/favorites", favoritesTag, FavoritesRoutes);
 app.use("/orders", ordersTag, OrdersRoutes);
 app.use("/cart-products", ordersTag, CartProductsRoutes);
