@@ -68,13 +68,14 @@ const getOrders = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     const { id } = req.params;
+    const {status} = req.query;
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       order:[["updatedAt","DESC"]],
       where: {
         UserId: id,
-        
+        status:status||"NEGOTIATION"
       },
       include: [
         {
@@ -107,11 +108,14 @@ const getUserOrders = async (req, res) => {
 const getShopOrders = async (req, res) => {
   try {
     const { id } = req.params;
+    const {status} = req.query;
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       order:[["updatedAt","DESC"]],
-     
+      where:{
+        status:status||"NEGOTIATION"
+      },
       include: [{
         model:OrderedProduct,
         include:[{

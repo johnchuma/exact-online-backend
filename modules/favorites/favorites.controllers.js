@@ -53,11 +53,11 @@ const getUserFavorites = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: {
-     
         UserId:id
       },
       include:[{
         model:Product,
+        required:true,
         include: [ProductImage, ProductStat, ProductReview]
       }]
     });

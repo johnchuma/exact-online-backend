@@ -6,6 +6,8 @@ const {
   ProductImage,
   Message,
   Chat,
+  Shop,
+  User,
   Order,
   Sequelize,
 } = require("../../models");
@@ -139,6 +141,10 @@ const getTopic = async (req, res) => {
             model:Product,
             include:[ProductImage]
           }
+        },{
+          model:Shop
+        },{
+          model:User
         }]
       },{
         model:Product,

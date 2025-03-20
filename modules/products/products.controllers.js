@@ -204,6 +204,7 @@ const getShopProducts = async (req, res) => {
 const getRelatedProducts = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id)
     const product = await findProductByID(id);
     const response = await Product.findAndCountAll({
       limit: req.limit,
@@ -212,6 +213,10 @@ const getRelatedProducts = async (req, res) => {
         name: {
           [Op.like]: `%${req.keyword}%`,
         },
+        id:{
+          [Op.ne]:id
+        },
+        CategoryId:product.CategoryId
       },
       include: [ProductImage, ProductStat, ProductReview,{
         model:Favorite,
