@@ -40,7 +40,7 @@ const getServices = async (req, res) => {
     console.log(req.keyword);
     let filter = {
       name: {
-        [Op.like]: `%${req.keyword ?? ""}%`,
+        [Op.iLike]: `%${req.keyword ?? ""}%`,
       },
     };
     if (category && category != "All") {
@@ -122,6 +122,28 @@ const getServicesForYou = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const getPopularServices = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const response = await Service.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: {
+        name: {
+          [Op.like]: `%${req.keyword}%`,
+        },
+      },
+      include: [ServiceImage, Shop],
+    });
+    successResponse(res, {
+      count: response.count,
+      page: req.page,
+      ...response,
+    });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+};
 const getShopServices = async (req, res) => {
   try {
     const { id } = req.params;
@@ -134,7 +156,10 @@ const getShopServices = async (req, res) => {
         },
         ShopId: id,
       },
-      include: [ServiceImage],
+      include: [{
+        model:ServiceImage,
+        required:true
+      }],
     });
     successResponse(res, {
       count: response.count,
@@ -217,6 +242,7 @@ module.exports = {
   getServiceSearch,
   addService,
   getRelatedServices,
+  getPopularServices,
   getService,
   updateService,
 };

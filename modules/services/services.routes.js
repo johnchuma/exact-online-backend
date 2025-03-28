@@ -11,6 +11,7 @@ const {
   getServicesForYou,
   getRelatedServices,
   getServiceSearch,
+  getPopularServices,
 } = require("./services.controllers");
 const { getPagination } = require("../../utils/getPagination");
 
@@ -21,6 +22,7 @@ router.get("/", validateJWT, getPagination, getServices);
 router.get("/new", validateJWT, getPagination, getNewArrivalServices);
 router.get("/search/:keyword", validateJWT, getServiceSearch);
 router.get("/for-you", validateJWT, getPagination, getServicesForYou);
+router.get("/popular", validateJWT, getPagination, getPopularServices);
 router.get("/shop/:id", validateJWT, getPagination, getShopServices);
 router.get(
   "/related/service/:id",

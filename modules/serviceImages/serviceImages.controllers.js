@@ -20,6 +20,7 @@ const addServiceImage = async (req, res) => {
   try {
     let { ServiceId } = req.body;
     const image = await getUrl(req);
+    console.log(ServiceId,image);
     const response = await ServiceImage.create({
       ServiceId,
       image,

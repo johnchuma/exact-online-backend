@@ -18,11 +18,11 @@ const findCategoryByID = async (id) => {
 };
 const addCategory = async (req, res) => {
   try {
-    let { name, category } = req.body;
+    let { name, type } = req.body;
     const image = await getUrl(req);
     const response = await Category.create({
       name,
-      category,
+      type,
       image,
     });
     successResponse(res, response);
@@ -31,17 +31,22 @@ const addCategory = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const getCategories = async (req, res) => {
   try {
+    const {type} = req.query;
+    let options = {
+      name: {
+        [Op.like]: `%${req.keyword}%`,
+      }
+    }
+    if(type){
+      options.type = type =="null"?"product":type
+    }
     const response = await Category.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
-      include: [CategoryProductSpecification],
+      where:options,
     });
     successResponse(res, {
       count: response.count,

@@ -37,6 +37,10 @@ module.exports = {
         type: DataTypes.STRING,
         defaultValue: "customer",
       },
+      token:{
+        type: DataTypes.TEXT,
+        allowNull:true
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
