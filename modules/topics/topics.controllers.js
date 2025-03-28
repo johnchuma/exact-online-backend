@@ -13,7 +13,6 @@ const {
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 
-
 const findTopicByID = async (id) => {
   try {
     const product = await Topic.findOne({
@@ -31,33 +30,35 @@ const addTopic = async (req, res) => {
   try {
     let { ChatId, OrderId, ProductId } = req.body;
     let options;
-    if(OrderId){
+    if (OrderId) {
       options = {
         ChatId,
-        OrderId
-      }
-    }else{
+        OrderId,
+      };
+    } else {
       options = {
         ChatId,
-        ProductId
-      }
+        ProductId,
+      };
     }
     let topic = await Topic.findOne({
       where: options,
     });
-    if(!topic){
+    if (!topic) {
       topic = await Topic.create({
         ChatId,
         OrderId,
         ProductId,
-      })
+      });
     }
-     topic = await Topic.findOne({
+    topic = await Topic.findOne({
       where: options,
-      include:[{
-        model:Chat
-      }]
-    })
+      include: [
+        {
+          model: Chat,
+        },
+      ],
+    });
     successResponse(res, topic);
   } catch (error) {
     console.log(error);
@@ -70,7 +71,7 @@ const getTopics = async (req, res) => {
     const response = await Topic.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      order:[["createdAt",'DESC']],
+      order: [["createdAt", "DESC"]],
       where: {
         ChatId: id,
       },
@@ -84,7 +85,7 @@ const getTopics = async (req, res) => {
               ORDER BY "Messages"."createdAt" DESC
               LIMIT 1
             )`),
-            'lastMessage'
+            "lastMessage",
           ],
           [
             Sequelize.literal(`(
@@ -94,27 +95,34 @@ const getTopics = async (req, res) => {
               ORDER BY "Messages"."createdAt" DESC
               LIMIT 1
             )`),
-            'lastMessageDatetime'
+            "lastMessageDatetime",
           ],
         ],
       },
-      include: [{
-        model: Order,
-        include: [{
-          model: OrderedProduct,
-          include: {
-            model: Product,
-            include: [ProductImage]
-          },
-        }]
-      }, {
-        model: Product,
-        include: [ProductImage],
-      }, {
-        model: Message
-      },{
-        model:Chat
-      }]
+      include: [
+        {
+          model: Order,
+          include: [
+            {
+              model: OrderedProduct,
+              include: {
+                model: Product,
+                include: [ProductImage],
+              },
+            },
+          ],
+        },
+        {
+          model: Product,
+          include: [ProductImage],
+        },
+        {
+          model: Message,
+        },
+        {
+          model: Chat,
+        },
+      ],
     });
     successResponse(res, {
       count: response.count,
@@ -133,27 +141,39 @@ const getTopic = async (req, res) => {
       where: {
         id,
       },
-      include:[{
-        model:Order,
-        include:[{
-          model:OrderedProduct,
-          include:{
-            model:Product,
-            include:[ProductImage]
-          }
-        },{
-          model:Shop
-        },{
-          model:User
-        }]
-      },{
-        model:Product,
-        include:[ProductImage]
-      }]
+      include: [
+        {
+          model: Order,
+          include: [
+            {
+              model: OrderedProduct,
+              include: {
+                model: Product,
+                include: [ProductImage],
+              },
+            },
+            {
+              model: Shop,
+            },
+            {
+              model: User,
+            },
+          ],
+        },
+        {
+          model: Product,
+          include: [
+            {
+              model: Shop,
+            },
+          ],
+          include: [ProductImage],
+        },
+      ],
     });
     successResponse(res, topic);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     errorResponse(res, error);
   }
 };
