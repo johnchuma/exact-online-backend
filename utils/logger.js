@@ -1,5 +1,12 @@
+require("dotenv").config()
 const winston = require("winston");
+const { Logtail } = require("@logtail/node");
+const { LogtailTransport } = require("@logtail/winston");
 
+// Create a Logtail client
+const logtail = new Logtail(process.env.LOGTAIL_TOKEN,{
+  endpoint:`https://${process.env.LOGTAIL_URL}`
+});
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
@@ -8,6 +15,7 @@ const logger = winston.createLogger({
     winston.format.prettyPrint()
   ),
   transports: [
+    new LogtailTransport(logtail),
     new winston.transports.File({
       filename: "logs/info.log",
       level: "info",
