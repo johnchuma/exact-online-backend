@@ -120,8 +120,14 @@ const getUserChats = async (req, res) => {
         UserId: id,
       },
       include: [
-        { model: Shop },
-        { model: User },
+        {
+          model:User,
+          required:true
+        },
+       {
+        model: Shop,
+        required:true
+       },
         {
           model: Topic,
           include: [
@@ -207,8 +213,14 @@ const getShopChats = async (req, res) => {
         ],
       },
       include: [
-        User,
-        Shop,
+        {
+          model:User,
+          required:true
+        },
+       {
+        model: Shop,
+        required:true
+       },
         {
           model: Topic,
           include: [
