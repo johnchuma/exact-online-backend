@@ -79,7 +79,11 @@ const io = new Server(server, {
   },
 });
 const { errorResponse } = require("./utils/responses");
+<<<<<<< HEAD
 const { scrapeResults } = require("./utils/scrapper");
+=======
+const logger = require("./utils/logger");
+>>>>>>> c66692bf3c32a1809418f7bddce6e40aad5134fc
 app.use("/files", express.static("files"));
 app.use("/extracted", express.static("extracted"));
 app.use(express.json());
@@ -161,5 +165,6 @@ io.on("connection", (socket) => {
 });
 
 server.listen(5000, () => {
+  logger.info("Server started at port 5000");
   console.log("Server started at port 5000");
 });
