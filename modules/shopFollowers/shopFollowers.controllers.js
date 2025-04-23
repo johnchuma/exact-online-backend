@@ -35,6 +35,7 @@ const getShopFollowers = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
     });
+  
     successResponse(res, {
       count: response.count,
       page: req.page,

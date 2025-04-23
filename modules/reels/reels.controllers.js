@@ -60,6 +60,7 @@ const getReels = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const getShopReels = async (req, res) => {
   try {
     const { id } = req.params;
@@ -110,34 +111,33 @@ const getReel = async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.user;
-    console.log(user)
-    const reel = await Reel.findOne({
-      where: {
-        id,
-      },
+  
+    // Step 1: Get the specific reel by ID
+    const mainReel = await Reel.findOne({
+      where: { id },
       include: [
-       {
-        model:ReelStat,
-        where: {
-          UserId: user.id,
-          type:'like'
+        {
+          model: ReelStat,
+          where: {
+            UserId: user.id,
+            type: 'like'
+          },
+          required: false
         },
-        required:false
-       },
         {
           model: Shop,
           attributes: {
             include: [
               [
-                Sequelize.literal(
-                  `(EXISTS (
+                Sequelize.literal(`
+                  EXISTS (
                     SELECT 1
                     FROM "ShopFollowers"
                     WHERE "ShopFollowers"."UserId" = :userId
                     AND "ShopFollowers"."ShopId" = "Shop"."id"
-                  ))`
-                ),
-                "following", // Alias for whether the user follows the shop
+                  )
+                `),
+                'following'
               ],
               [
                 Sequelize.literal(`
@@ -148,43 +148,109 @@ const getReel = async (req, res) => {
                     AND "ReelStats"."type" = 'like'
                   )
                 `),
-                "likes", // Alias for total likes
+                'likes'
               ],
               [
-                Sequelize.literal(
-                  `(EXISTS (
+                Sequelize.literal(`
+                  EXISTS (
                     SELECT 1
                     FROM "ReelStats"
                     WHERE "ReelStats"."UserId" = :userId
                     AND "ReelStats"."ReelId" = "Reel"."id"
                     AND "ReelStats"."type" = 'like'
-                  ))`
-                ),
-                "liked", // Alias for whether the user follows the shop
-              ],
-              
-            ],
+                  )
+                `),
+                'liked'
+              ]
+            ]
           },
           include: [
             {
               model: ShopFollower,
-              where: {
-                UserId: user.id,
-              },
-              required: false,
-            },
-           
-          ],
-        },
-        
+              where: { UserId: user.id },
+              required: false
+            }
+          ]
+        }
       ],
-      replacements: { userId: user.id }, // Passing user.id as a parameter
+      replacements: { userId: user.id }
     });
-    
-    successResponse(res, reel);
+  
+    // Step 2: Get other reels, excluding the one with the same ID
+    const otherReels = await Reel.findAll({
+      where: {
+        id: {
+          [Sequelize.Op.ne]: id // not equal to the given id
+        }
+      },
+      include: [
+        {
+          model: ReelStat,
+          where: {
+            UserId: user.id,
+            type: 'like'
+          },
+          required: false
+        },
+        {
+          model: Shop,
+          attributes: {
+            include: [
+              [
+                Sequelize.literal(`
+                  EXISTS (
+                    SELECT 1
+                    FROM "ShopFollowers"
+                    WHERE "ShopFollowers"."UserId" = :userId
+                    AND "ShopFollowers"."ShopId" = "Shop"."id"
+                  )
+                `),
+                'following'
+              ],
+              [
+                Sequelize.literal(`
+                  (
+                    SELECT COUNT(*)
+                    FROM "ReelStats"
+                    WHERE "ReelStats"."ReelId" = "Reel"."id"
+                    AND "ReelStats"."type" = 'like'
+                  )
+                `),
+                'likes'
+              ],
+              [
+                Sequelize.literal(`
+                  EXISTS (
+                    SELECT 1
+                    FROM "ReelStats"
+                    WHERE "ReelStats"."UserId" = :userId
+                    AND "ReelStats"."ReelId" = "Reel"."id"
+                    AND "ReelStats"."type" = 'like'
+                  )
+                `),
+                'liked'
+              ]
+            ]
+          },
+          include: [
+            {
+              model: ShopFollower,
+              where: { UserId: user.id },
+              required: false
+            }
+          ]
+        }
+      ],
+      replacements: { userId: user.id }
+    });
+  
+    // Step 3: Combine and send
+    const reels = mainReel ? [mainReel, ...otherReels] : otherReels;
+    successResponse(res, reels);
   } catch (error) {
     errorResponse(res, error);
   }
+  
 };
 const updateReel = async (req, res) => {
   try {

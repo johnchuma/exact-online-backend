@@ -1,5 +1,5 @@
-const { Op } = require("sequelize");
-const { Service, ServiceImage, Shop } = require("../../models");
+const { Op,Sequelize } = require("sequelize");
+const { Service, ServiceImage,ShopFollower, Shop } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 
 const findServiceByID = async (id) => {
@@ -144,6 +144,7 @@ const getPopularServices = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const getShopServices = async (req, res) => {
   try {
     const { id } = req.params;
@@ -170,16 +171,19 @@ const getShopServices = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const getRelatedServices = async (req, res) => {
   try {
     const { id } = req.params;
-    const service = await findServiceByID(id);
     const response = await Service.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: {
         name: {
           [Op.like]: `%${req.keyword}%`,
+        },
+        id:{
+          [Op.ne]:id
         },
       },
       include: [ServiceImage],
@@ -193,14 +197,40 @@ const getRelatedServices = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const getService = async (req, res) => {
   try {
     const { id } = req.params;
+    const user = req.user;
     const service = await Service.findOne({
       where: {
         id,
       },
-      include: [ServiceImage, Shop],
+      include: [ServiceImage, {
+        model:Shop,
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(`
+                EXISTS (
+                  SELECT 1
+                  FROM "ShopFollowers"
+                  WHERE "ShopFollowers"."UserId" = :userId
+                  AND "ShopFollowers"."ShopId" = "Shop"."id"
+                )
+              `),
+              'following'
+            ],
+          ]},
+          include: [
+            {
+              model: ShopFollower,
+              where: { UserId: user.id },
+              required: false
+            }
+          ]
+      }],
+      replacements: { userId: user.id }
     });
     successResponse(res, service);
   } catch (error) {
@@ -208,6 +238,7 @@ const getService = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const updateService = async (req, res) => {
   try {
     const { id } = req.params;
@@ -220,6 +251,7 @@ const updateService = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const deleteService = async (req, res) => {
   try {
     const { id } = req.params;

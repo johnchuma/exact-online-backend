@@ -73,10 +73,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-
       isHidden: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+      },
+      isNegotiable:{
+        type: DataTypes.BOOLEAN,
+        defaultValue:true,
       },
       ShopId: {
         type: DataTypes.UUID,

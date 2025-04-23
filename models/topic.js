@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Topic.belongsTo(models.Chat)
       Topic.belongsTo(models.Product)
+      Topic.belongsTo(models.Service)
       Topic.belongsTo(models.Order)
       Topic.hasMany(models.Message)
     }
@@ -28,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
       },
       ProductId: {
+        allowNull: true,
+        type: DataTypes.UUID,
+      },
+      ServiceId: {
         allowNull: true,
         type: DataTypes.UUID,
       },

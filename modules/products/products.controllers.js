@@ -1,10 +1,11 @@
-const { Op } = require("sequelize");
+const { Op,Sequelize } = require("sequelize");
 const {
   Product,
   ProductImage,
   ProductStat,
   OrderedProduct,
   CartProduct,
+  ShopFollower,
   ProductReview,
   Favorite,
   User,
@@ -41,6 +42,7 @@ const addProduct = async (req, res) => {
       deliveryScope,
       productLink,
       isHidden,
+      isNegotiable,
       specifications,
       description,
       CategoryId,
@@ -53,6 +55,7 @@ const addProduct = async (req, res) => {
       priceIncludeDelivery,
       deliveryScope,
       productLink,
+      isNegotiable,
       isHidden,
       specifications,
       description,
@@ -172,6 +175,7 @@ const getProductsForYou = async (req, res) => {
     errorResponse(res, error);
   }
 };
+
 const getShopProducts = async (req, res) => {
   try {
     const { id } = req.params;
@@ -238,6 +242,7 @@ const getRelatedProducts = async (req, res) => {
 };
 const getProduct = async (req, res) => {
   try {
+    const user = req.user;
     const { id } = req.params;
     const product = await  Product.findOne({
       where: {
@@ -253,15 +258,45 @@ const getProduct = async (req, res) => {
         },
         ProductImage, ProductStat, {
         model:ProductReview,
+        required:false,
+        description:{
+          [Op.ne]:null
+        },
         include:[User]
-      },Shop,{
+      },{
+        model:Shop,
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(`
+                EXISTS (
+                  SELECT 1
+                  FROM "ShopFollowers"
+                  WHERE "ShopFollowers"."UserId" = :userId
+                  AND "ShopFollowers"."ShopId" = "Shop"."id"
+                )
+              `),
+              'following'
+            ],
+          ]},
+          include: [
+            {
+              model: ShopFollower,
+              where: { UserId: user.id },
+              required: false
+            }
+          ]
+        
+      },{
         model:Favorite,
+        
         where:{
           UserId:req.user.id
         },
         required:false
 
       }],
+      replacements: { userId: user.id }
     });
     successResponse(res, product);
   } catch (error) {

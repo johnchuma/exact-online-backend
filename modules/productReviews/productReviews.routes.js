@@ -12,7 +12,7 @@ const { getPagination } = require("../../utils/getPagination");
 const router = Router();
 
 router.post("/", validateJWT, addProductReview);
-router.get("/", validateJWT, getPagination, getProductReviews);
+router.get("/product/:id", validateJWT, getPagination, getProductReviews);
 router.get("/:id", validateJWT, getProductReview);
 router.patch("/:id", validateJWT, updateProductReview);
 router.delete("/:id", validateJWT, deleteProductReview);

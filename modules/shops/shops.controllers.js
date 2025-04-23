@@ -1,4 +1,4 @@
-const { Op, fn } = require("sequelize");
+const { Op, fn ,Sequelize} = require("sequelize");
 const {
   Shop,
   ShopCalender,
@@ -7,7 +7,6 @@ const {
   ShopView,
   Subscription,
   ShopFollower,
-  Sequelize,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
@@ -145,6 +144,8 @@ const getUserShopFollowings = async (req, res) => {
 const getShop = async (req, res) => {
   try {
     const { id } = req.params;
+    const user = req.user;
+
     console.log(id);
     const shop = await Shop.findOne({
       where: {
@@ -229,10 +230,27 @@ const getShop = async (req, res) => {
               )
             `),
             "reelLikes"
-          ],          
+          ], 
+          [
+                        Sequelize.literal(`
+                          EXISTS (
+                            SELECT 1
+                            FROM "ShopFollowers"
+                            WHERE "ShopFollowers"."UserId" = :userId
+                            AND "ShopFollowers"."ShopId" = "Shop"."id"
+                          )
+                        `),
+                        'following'
+                      ],         
         ],
       },
-      include:[ShopCalender,{
+      include:[
+        {
+          model: ShopFollower,
+          where: { UserId: user.id },
+          required: false
+        },
+        ShopCalender,{
         model:ShopSubscription,
         include:[Subscription],
         where:{
@@ -242,6 +260,8 @@ const getShop = async (req, res) => {
         },
         required:false
       },ShopView,],
+      replacements: { userId: user.id }
+
     });
     successResponse(res, shop);
   } catch (error) {

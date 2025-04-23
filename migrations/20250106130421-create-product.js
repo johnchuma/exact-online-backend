@@ -37,6 +37,10 @@ module.exports = {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
+      isNegotiable:{
+        type: DataTypes.BOOLEAN,
+        defaultValue:true,
+      },
       ShopId: {
         type: DataTypes.UUID,
         allowNull: false,

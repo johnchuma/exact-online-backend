@@ -17,6 +17,10 @@ module.exports = {
         allowNull: true,
         type: DataTypes.UUID,
       },
+      ServiceId: {
+        allowNull: true,
+        type: DataTypes.UUID,
+      },
       OrderId: {
         allowNull: true,
         type: DataTypes.UUID,

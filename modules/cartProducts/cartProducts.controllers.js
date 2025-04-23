@@ -40,7 +40,9 @@ const getUserCartProducts = async (req, res) => {
       },
       include: [{
         model:Product,
+        required:true,
         include:[ProductImage,Shop]
+
       }],
     });
     successResponse(res, {

@@ -79,6 +79,7 @@ const io = new Server(server, {
   },
 });
 const { errorResponse } = require("./utils/responses");
+const { scrapeResults } = require("./utils/scrapper");
 app.use("/files", express.static("files"));
 app.use("/extracted", express.static("extracted"));
 app.use(express.json());
@@ -133,11 +134,14 @@ app.use(
   CategoryProductSpecificationsRoutes
 );
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get("/", (req, res) => {
+app.get("/",(req,res)=>{
   try {
-    res.send("Server is working fine");
-  } catch (error) {}
-});
+    res.status(200).send("Server is running fine")
+  } catch (error) {
+    res.status(500).send("Server is not running")
+  }
+})
+app.get("/scrap", scrapeResults);
 app.get("/open-app", (req, res) => {
   try {
     res.redirect(
@@ -147,6 +151,7 @@ app.get("/open-app", (req, res) => {
     errorResponse(res, error);
   }
 });
+
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 

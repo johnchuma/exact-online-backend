@@ -4,6 +4,8 @@ const {
   OrderedProduct,
   Product,
   ProductImage,
+  Service,
+  ServiceImage,
   Message,
   Chat,
   Shop,
@@ -28,14 +30,21 @@ const findTopicByID = async (id) => {
 };
 const addTopic = async (req, res) => {
   try {
-    let { ChatId, OrderId, ProductId } = req.body;
+    let { ChatId, OrderId, ProductId,ServiceId } = req.body;
     let options;
     if (OrderId) {
       options = {
         ChatId,
         OrderId,
       };
-    } else {
+    } 
+    else if(ServiceId) {
+      options = {
+        ChatId,
+        ServiceId,
+      };
+    }
+    else{
       options = {
         ChatId,
         ProductId,
@@ -49,6 +58,7 @@ const addTopic = async (req, res) => {
         ChatId,
         OrderId,
         ProductId,
+        ServiceId
       });
     }
     topic = await Topic.findOne({
@@ -117,6 +127,10 @@ const getTopics = async (req, res) => {
           include: [ProductImage],
         },
         {
+          model:Service,
+          include:[ServiceImage]
+        },
+        {
           model: Message,
         },
         {
@@ -152,23 +166,21 @@ const getTopic = async (req, res) => {
                 include: [ProductImage],
               },
             },
-            {
-              model: Shop,
-            },
-            {
-              model: User,
-            },
+           
           ],
         },
         {
           model: Product,
-          include: [
-            {
-              model: Shop,
-            },
-          ],
-          include: [ProductImage],
+          include: [ProductImage, ],
         },
+        {
+          model:Service,
+          include:[ServiceImage]
+        },
+        {
+          model:Chat,
+          include:[User,Shop]
+        }
       ],
     });
     successResponse(res, topic);
