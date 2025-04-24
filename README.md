@@ -1,6 +1,6 @@
-# Exact Online Backend Project
+# Exact Online Backend
 
-This is a backend application designed to integrate with Exact Online, a cloud-based business software for accounting, CRM, and ERP. The project provides a robust API to interact with Exact Online's services, enabling seamless data synchronization and automation for business processes.
+The Exact Online Backend is a robust Node.js-based API server for an e-commerce mobile application. It powers key features such as phone number-based authentication, product and service listings, reels, real-time chat, and notifications. The backend integrates with PostgreSQL for data storage, uses Socket.IO for real-time communication, and provides Swagger-based API documentation.
 
 ## Table of Contents
 - [Features](#features)
@@ -10,33 +10,43 @@ This is a backend application designed to integrate with Exact Online, a cloud-b
 - [Configuration](#configuration)
 - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
+- [Real-Time Features](#real-time-features)
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Features
-- Secure authentication with Exact Online OAuth 2.0.
-- CRUD operations for key Exact Online entities (e.g., accounts, invoices, and transactions).
-- Real-time data synchronization with Exact Online.
-- Error handling and logging for robust operation.
-- Scalable architecture for handling high request volumes.
+- **Phone Number Authentication**: Secure user login using SMS-based authentication.
+- **Product and Service Listings**: Manage products, categories, specifications, and service offerings.
+- **Reels**: Support for short video content with statistics tracking.
+- **Real-Time Chat**: In-app messaging with Socket.IO for seamless communication.
+- **Notifications**: Push notifications for orders, promotions, and updates.
+- **Shopping Cart and Orders**: Manage cart products, orders, and order history.
+- **Shop Management**: Features for shop profiles, calendars, documents, and subscriptions.
+- **Promotions and Ads**: Handle promoted products, banners, and ad dimensions.
+- **Favorites and Reviews**: Allow users to favorite products and leave reviews.
 
 ## Technologies
-- **Node.js**: JavaScript runtime for building the backend.
-- **Express.js**: Web framework for creating RESTful APIs.
-- **PostgreSQL**: Relational database for storing application data.
-- **Axios**: HTTP client for making requests to Exact Online APIs.
-- **Winston**: Logging library for debugging and monitoring.
-- **Jest**: Testing framework for unit and integration tests.
-- **Docker**: Containerization for consistent development and deployment.
+- **Node.js**: JavaScript runtime for the backend.
+- **Express.js**: Web framework for building RESTful APIs.
+- **PostgreSQL**: Relational database with Sequelize ORM.
+- **Socket.IO**: Real-time communication for chat and notifications.
+- **Swagger**: API documentation with `swagger-ui-express` and `swagger-autogen`.
+- **Multer**: File uploads for product images, service images, and reels.
+- **JWT and Bcrypt**: Secure authentication and password hashing.
+- **Winston and Logtail**: Logging for debugging and monitoring.
+- **Axios and Cheerio**: HTTP requests and web scraping utilities.
+- **Fluent-FFmpeg**: Video processing for reels.
+- **dotenv**: Environment variable management.
 
 ## Prerequisites
-- Node.js (v16 or higher)
-- PostgreSQL (v13 or higher)
-- Exact Online developer account and API credentials
-- Docker (optional, for containerized deployment)
-- Git
+- **Node.js**: v16 or higher
+- **PostgreSQL**: v13 or higher
+- **Git**: For cloning the repository
+- **SMS Service Account**: For phone number authentication (e.g., configured via `SMS_AUTH`)
+- **Gmail Account**: For email notifications (configured via `GMAIL_USER` and `GMAIL_PASS`)
+- **Google Cloud Credentials**: For specific integrations (configured via `GOOGLE_PRIVATE_KEY`)
 
 ## Installation
 1. Clone the repository:
@@ -52,98 +62,144 @@ This is a backend application designed to integrate with Exact Online, a cloud-b
 
 3. Set up the PostgreSQL database:
    ```bash
-   createdb exact_online_db
-   npm run migrate
+   createdb exact_online
+   npx sequelize-cli db:migrate
    ```
 
 ## Configuration
-Create a `.env` file in the root directory and add the following environment variables:
+Create a `.env` file in the root directory with the following environment variables:
 
 ```bash
-# Exact Online API
-EXACT_CLIENT_ID=your_client_id
-EXACT_CLIENT_SECRET=your_client_secret
-EXACT_REDIRECT_URI=http://localhost:3000/auth/callback
-
 # Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=exact_online_db
-DB_USER=your_username
-DB_PASSWORD=your_password
+DB_USERNAME=postgres
+DB_PASSWORD=ExactOnline@2025
+DB_NAME=exact_online
+DB_HOST=146.190.53.96
+
+# Authentication
+SMS_AUTH="smms"
+ACCESS_TOKEN="token"
+JWT_SECRET=your_jwt_secret
+
+# Email
+GMAIL_USER=email
+GMAIL_PASS=password
 
 # Application
-PORT=3000
+PORT=5000
 NODE_ENV=development
+
 ```
 
-Refer to Exact Online's [API documentation](https://developers.exactonline.com/) for obtaining API credentials.
+**Note**: Ensure sensitive data (e.g., `ACCESS_TOKEN`, `GMAIL_PASS`, `GOOGLE_PRIVATE_KEY`) is kept secure and not exposed in public repositories.
 
 ## Running the Application
-1. Start the development server:
+1. Start the server:
    ```bash
-   npm run dev
+   npm start
    ```
 
-2. The application will be available at `http://localhost:3000`.
+2. The application will be available at `http://localhost:5000`.
+
+3. Access the API documentation at `http://localhost:5000/api-docs` or the hosted version at [https://api.exactonline.co.tz/api-docs](https://api.exactonline.co.tz/api-docs).
 
 ## API Endpoints
-Below are some example endpoints. See the full API documentation in `/docs/api.md` for details.
+The backend exposes a wide range of RESTful APIs. Key endpoints include:
 
 | Method | Endpoint                     | Description                          |
 |--------|------------------------------|--------------------------------------|
-| GET    | `/api/accounts`              | Retrieve a list of accounts          |
-| POST   | `/api/invoices`              | Create a new invoice                 |
-| PUT    | `/api/invoices/:id`          | Update an existing invoice           |
-| GET    | `/api/auth/exact-online`     | Initiate OAuth 2.0 authentication    |
+| GET    | `/users`                     | Retrieve user profiles               |
+| POST   | `/users/login`               | Authenticate via phone number        |
+| GET    | `/products`                  | List all products                    |
+| POST   | `/products`                  | Create a new product                 |
+| GET    | `/services`                  | List all services                    |
+| GET    | `/reels`                     | Retrieve reels for the app           |
+| POST   | `/orders`                    | Create a new order                   |
+| GET    | `/chats`                     | Retrieve user chat sessions          |
+
+For a complete list of endpoints, refer to the [API documentation](https://api.exactonline.co.tz/api-docs).
 
 Example request:
 ```bash
-curl -X GET http://localhost:3000/api/accounts \
-  -H "Authorization: Bearer your_access_token"
+curl -X GET http://localhost:5000/products \
+  -H "Authorization: Bearer your_jwt_token"
+```
+
+## Real-Time Features
+The backend uses Socket.IO for real-time features such as:
+- **Chat**: Real-time messaging between users (`/chats`, `/messages`).
+- **Notifications**: Instant updates for order status, promotions, etc. (`/notifications`).
+
+To connect to the Socket.IO server:
+```javascript
+import io from 'socket.io-client';
+const socket = io('http://localhost:5000');
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
 ```
 
 ## Testing
-Run the test suite to ensure the application works as expected:
+The test suite is not yet implemented. To add tests:
+1. Install a testing framework like Jest:
+   ```bash
+   npm install --save-dev jest
+   ```
+2. Update the `package.json` test script:
+   ```json
+   "scripts": {
+     "test": "jest"
+   }
+   ```
+3. Create test files in a `__tests__` directory.
+
+Run tests with:
 ```bash
 npm test
 ```
 
-This includes unit tests for services and integration tests for API endpoints.
-
 ## Deployment
-To deploy the application to a platform like Heroku:
-1. Install the Heroku CLI.
-2. Log in to Heroku:
+To deploy the application (e.g., to a platform like Render or AWS):
+1. Ensure the `.env` variables are set in the deployment environment.
+2. Build and start the application:
    ```bash
-   heroku login
-   ```
-3. Create a new Heroku app:
-   ```bash
-   heroku create
-   ```
-4. Set environment variables on Heroku:
-   ```bash
-   heroku config:set EXACT_CLIENT_ID=your_client_id
-   ```
-5. Deploy the application:
-   ```bash
-   git push heroku main
+   npm install
+   node index.js
    ```
 
 For Docker-based deployment:
-```bash
-docker build -t exact-online-backend .
-docker run -p 3000:3000 exact-online-backend
-```
+1. Create a `Dockerfile`:
+   ```dockerfile
+   FROM node:16
+   WORKDIR /app
+   COPY package*.json ./
+   RUN npm install
+   COPY . .
+   EXPOSE 5000
+   CMD ["npm", "start"]
+   ```
+2. Build and run:
+   ```bash
+   docker build -t exact-online-backend .
+   docker run -p 5000:5000 --env-file .env exact-online-backend
+   ```
+
+**Note**: Update `DB_HOST` and other environment variables for production.
 
 ## Contributing
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Follow these steps:
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/your-feature`).
 3. Commit your changes (`git commit -m 'Add your feature'`).
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Open a pull request.
 
+Please adhere to the following:
+- Use ESLint for code formatting.
+- Write clear commit messages.
+- Test changes locally before submitting.
+
+Report issues or suggest features via [GitHub Issues](https://github.com/your-username/exact-online-backend/issues).
+
 ## License
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+This project is licensed under the ISC License. See the [LICENSE](./LICENSE) file for details.
