@@ -77,7 +77,7 @@ DB_NAME=exact_online
 DB_HOST=host
 
 # Authentication
-SMS_AUTH="smms"
+SMS_AUTH="sms_auth_key"
 ACCESS_TOKEN="token"
 JWT_SECRET=your_jwt_secret
 
