@@ -96,7 +96,7 @@ NODE_ENV=development
 ## Running the Application
 1. Start the server:
    ```bash
-   npm start
+   node index.js
    ```
 
 2. The application will be available at `http://localhost:5000`.
