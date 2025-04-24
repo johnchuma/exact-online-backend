@@ -72,9 +72,9 @@ Create a `.env` file in the root directory with the following environment variab
 ```bash
 # Database
 DB_USERNAME=postgres
-DB_PASSWORD=ExactOnline@2025
+DB_PASSWORD=password
 DB_NAME=exact_online
-DB_HOST=146.190.53.96
+DB_HOST=host
 
 # Authentication
 SMS_AUTH="smms"
