@@ -167,25 +167,6 @@ To deploy the application (e.g., to a platform like Render or AWS):
    node index.js
    ```
 
-For Docker-based deployment:
-1. Create a `Dockerfile`:
-   ```dockerfile
-   FROM node:16
-   WORKDIR /app
-   COPY package*.json ./
-   RUN npm install
-   COPY . .
-   EXPOSE 5000
-   CMD ["npm", "start"]
-   ```
-2. Build and run:
-   ```bash
-   docker build -t exact-online-backend .
-   docker run -p 5000:5000 --env-file .env exact-online-backend
-   ```
-
-**Note**: Update `DB_HOST` and other environment variables for production.
-
 ## Contributing
 Contributions are welcome! Follow these steps:
 1. Fork the repository.
