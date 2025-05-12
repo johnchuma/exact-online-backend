@@ -74,6 +74,7 @@ const updateMessage = async (req, res) => {
 const markAsReadShopMessage = async (req, res) => {
   try {
     const { id } = req.params;
+    const { ChatId } = req.query;
     console.log("marking shop messages as read");
 
     // Find messages with the required associations
@@ -84,7 +85,7 @@ const markAsReadShopMessage = async (req, res) => {
           include: [
             {
               model: Chat,
-              where: { ShopId: id },
+              where: { ShopId: id, id: ChatId },
               required: true,
             },
           ],
@@ -119,6 +120,8 @@ const markAsReadShopMessage = async (req, res) => {
 const markAsReadUserMessage = async (req, res) => {
   try {
     const { id } = req.params;
+    const { ChatId } = req.query;
+
     console.log("marking user messages as read");
     // Find messages related to the user
     const messages = await Message.findAll({
@@ -128,7 +131,7 @@ const markAsReadUserMessage = async (req, res) => {
           include: [
             {
               model: Chat,
-              where: { UserId: id },
+              where: { UserId: id, id: ChatId },
               required: true,
             },
           ],
