@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Message,Topic,Chat } = require("../../models");
+const { Message, Topic, Chat } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -38,7 +38,7 @@ const getTopicMessages = async (req, res) => {
   try {
     const { id } = req.params;
     const response = await Message.findAll({
-      order:[["createdAt"]],
+      order: [["createdAt"]],
       where: {
         TopicId: id,
       },
@@ -74,6 +74,7 @@ const updateMessage = async (req, res) => {
 const markAsReadShopMessage = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("marking shop messages as read");
 
     // Find messages with the required associations
     const messages = await Message.findAll({
@@ -93,7 +94,9 @@ const markAsReadShopMessage = async (req, res) => {
     });
 
     if (messages.length === 0) {
-      return res.status(404).json({ message: "No messages found for this shop." });
+      return res
+        .status(404)
+        .json({ message: "No messages found for this shop." });
     }
 
     // Update messages after finding them
@@ -116,7 +119,7 @@ const markAsReadShopMessage = async (req, res) => {
 const markAsReadUserMessage = async (req, res) => {
   try {
     const { id } = req.params;
-
+    console.log("marking user messages as read");
     // Find messages related to the user
     const messages = await Message.findAll({
       include: [
@@ -135,7 +138,9 @@ const markAsReadUserMessage = async (req, res) => {
     });
 
     if (messages.length === 0) {
-      return res.status(404).json({ message: "No messages found for this user." });
+      return res
+        .status(404)
+        .json({ message: "No messages found for this user." });
     }
 
     // Extract message IDs and update them
