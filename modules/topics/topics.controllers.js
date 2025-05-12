@@ -30,21 +30,19 @@ const findTopicByID = async (id) => {
 };
 const addTopic = async (req, res) => {
   try {
-    let { ChatId, OrderId, ProductId,ServiceId } = req.body;
+    let { ChatId, OrderId, ProductId, ServiceId } = req.body;
     let options;
     if (OrderId) {
       options = {
         ChatId,
         OrderId,
       };
-    } 
-    else if(ServiceId) {
+    } else if (ServiceId) {
       options = {
         ChatId,
         ServiceId,
       };
-    }
-    else{
+    } else {
       options = {
         ChatId,
         ProductId,
@@ -58,7 +56,7 @@ const addTopic = async (req, res) => {
         ChatId,
         OrderId,
         ProductId,
-        ServiceId
+        ServiceId,
       });
     }
     topic = await Topic.findOne({
@@ -81,7 +79,7 @@ const getTopics = async (req, res) => {
     const response = await Topic.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      order: [["createdAt", "DESC"]],
+      order: [[Sequelize.col('"lastMessageDatetime"'), "DESC", "NULLS LAST"]],
       where: {
         ChatId: id,
       },
@@ -127,8 +125,8 @@ const getTopics = async (req, res) => {
           include: [ProductImage],
         },
         {
-          model:Service,
-          include:[ServiceImage]
+          model: Service,
+          include: [ServiceImage],
         },
         {
           model: Message,
@@ -166,21 +164,20 @@ const getTopic = async (req, res) => {
                 include: [ProductImage],
               },
             },
-           
           ],
         },
         {
           model: Product,
-          include: [ProductImage, ],
+          include: [ProductImage],
         },
         {
-          model:Service,
-          include:[ServiceImage]
+          model: Service,
+          include: [ServiceImage],
         },
         {
-          model:Chat,
-          include:[User,Shop]
-        }
+          model: Chat,
+          include: [User, Shop],
+        },
       ],
     });
     successResponse(res, topic);
