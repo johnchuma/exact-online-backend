@@ -6,169 +6,358 @@ const { randomNumber } = require("../../utils/random_number");
 const bcrypt = require("bcrypt");
 const { getUrl } = require("../../utils/get_url");
 const sendSMS = require("../../utils/send_sms");
-const findUserByID = async (id) => {
-  try {
-    const user = await User.findOne({
-      where: {
-        id,
-      },
-      include: [Shop],
-    });
-    return user;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-const checkIfUserExists = async (phone) => {
-  const user = await User.findOne({
-    where: {
-      phone,
-    },
-  });
-  return user;
-};
-const addAdmin = async (req, res) => {
-  try {
-    let { name, email, phone, password } = req.body;
-    password = bcrypt.hashSync(password, 10);
-    const response = await User.create({
-      name,
-      email,
-      password,
-      phone,
-      role: "admin",
-    });
-    successResponse(res, response);
-  } catch (error) {
-    errorResponse(res, error);
-  }
-};
+const logger = require("../../utils/logger");
+const { v4: uuidv4 } = require("uuid"); // For requestId
+
+const childLogger = logger.child({ module: "Users Module" });
+
 const addUser = async (req, res) => {
+  const requestId = uuidv4();
   try {
-    let { name, phone, email, role, password } = req.body;
-  console.log(req.body);
-    let user = await checkIfUserExists(phone);
+    childLogger.http("Received add user request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      body: req.body,
+    });
+
+    const { name, phone, email, role, password } = req.body;
+    childLogger.debug("Request body", { requestId, body: req.body });
+
+    childLogger.info("Checking if user exists", { requestId, phone });
+    const user = await checkIfUserExists(phone);
     if (user) {
-      res.status(403).send({
+      childLogger.warn("Phone number already used", { requestId, phone, userId: user.id });
+      return res.status(403).send({
         status: false,
         message: "Phone number is already used",
       });
-    } else {
-      let code = randomNumber();
-      // code = 123456;
-      //send verfication code sms
-      await sendSMS(phone,`Dear ${name},\n\n your verification code is ${code}, Enter this code in the form to preceed with the app. \n\nThank you`)
-
-      if(password){
-        password = bcrypt.hashSync(password, 10);
-      }
-      user = await User.create({
-        name,
-        phone,
-        email,
-        role,
-        password,
-        passcode: code,
-      });
-      successResponse(res, {
-        status: true,
-        message: "Verification code is sent to your phone number",
-      });
     }
+
+    const code = randomNumber();
+    childLogger.info("Generated verification code", { requestId, phone, code });
+
+    childLogger.info("Sending verification SMS", { requestId, phone });
+    await sendSMS(
+      phone,
+      `Dear ${name},\n\n your verification code is ${code}, Enter this code in the form to proceed with the app. \n\nThank you`
+    );
+
+    let hashedPassword = null;
+    if (password) {
+      childLogger.debug("Hashing password", { requestId });
+      hashedPassword = bcrypt.hashSync(password, 10);
+    }
+
+    childLogger.info("Creating new user", { requestId, phone, email, role });
+    const newUser = await User.create({
+      name,
+      phone,
+      email,
+      role,
+      password: hashedPassword,
+      passcode: code,
+    });
+
+    childLogger.info("User added successfully", {
+      requestId,
+      userId: newUser.id,
+      phone,
+      email,
+    });
+
+    successResponse(res, {
+      status: true,
+      message: "Verification code is sent to your phone number",
+    });
   } catch (error) {
-    console.log(error);
+    childLogger.error("Failed to create user", {
+      requestId,
+      phone: req.body.phone,
+      email: req.body.email,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
-const sendVerificationCode = async (req, res) => {
+
+const findUserByID = async (id) => {
+  const requestId = uuidv4();
   try {
-    let { phone } = req.body;
-    let user = await checkIfUserExists(phone);
+    childLogger.info("Finding user by ID", { requestId, userId: id });
+    const user = await User.findOne({
+      where: { id },
+      include: [Shop],
+    });
+    if (!user) {
+      childLogger.warn("User not found", { requestId, userId: id });
+    } else {
+      childLogger.info("User found", { requestId, userId: id });
+    }
+    return user;
+  } catch (error) {
+    childLogger.error("Failed to find user", {
+      requestId,
+      userId: id,
+      error: error.message,
+      stack: error.stack,
+    });
+    throw error;
+  }
+};
+
+const checkIfUserExists = async (phone) => {
+  const requestId = uuidv4();
+  try {
+    childLogger.info("Checking if user exists", { requestId, phone });
+    const user = await User.findOne({
+      where: { phone },
+    });
     if (user) {
-      let code = randomNumber();
-      // code = 123456;
-      //send verfication code sms
-      await sendSMS(phone,`Dear ${user.name},\nyour verification code is ${code}, Enter this code in the form to proceed with the app. \n\nThank you`)
-      user = await user.update({
-        passcode: code,
+      childLogger.info("User exists", { requestId, phone, userId: user.id });
+    } else {
+      childLogger.info("User does not exist", { requestId, phone });
+    }
+    return user;
+  } catch (error) {
+    childLogger.error("Failed to check if user exists", {
+      requestId,
+      phone,
+      error: error.message,
+      stack: error.stack,
+    });
+    throw error;
+  }
+};
+
+const addAdmin = async (req, res) => {
+  const requestId = uuidv4();
+  try {
+    childLogger.http("Received add admin request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      body: req.body,
+    });
+
+    const { name, email, phone, password } = req.body;
+    childLogger.debug("Request body", { requestId, body: req.body });
+
+    childLogger.debug("Hashing password", { requestId });
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    childLogger.info("Creating new admin", { requestId, email, phone });
+    const response = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role: "admin",
+    });
+
+    childLogger.info("Admin added successfully", {
+      requestId,
+      userId: response.id,
+      email,
+      phone,
+    });
+
+    successResponse(res, response);
+  } catch (error) {
+    childLogger.error("Failed to create admin", {
+      requestId,
+      email: req.body.email,
+      phone: req.body.phone,
+      error: error.message,
+      stack: error.stack,
+    });
+    errorResponse(res, error);
+  }
+};
+
+const sendVerificationCode = async (req, res) => {
+  const requestId = uuidv4();
+  try {
+    childLogger.http("Received send verification code request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      body: req.body,
+    });
+
+    const { phone } = req.body;
+    childLogger.debug("Request body", { requestId, body: req.body });
+
+    childLogger.info("Checking if user exists", { requestId, phone });
+    const user = await checkIfUserExists(phone);
+    if (user) {
+      const code = randomNumber();
+      childLogger.info("Generated verification code", { requestId, phone, code });
+
+      childLogger.info("Sending verification SMS", { requestId, phone });
+      await sendSMS(
+        phone,
+        `Dear ${user.name},\nyour verification code is ${code}, Enter this code in the form to proceed with the app. \n\nThank you`
+      );
+
+      childLogger.info("Updating user with verification code", { requestId, userId: user.id });
+      await user.update({ passcode: code });
+
+      childLogger.info("Verification code sent successfully", {
+        requestId,
+        userId: user.id,
+        phone,
       });
-       
+
       successResponse(res, {
         status: true,
         message: "Verification code is sent to your phone number",
       });
     } else {
+      childLogger.warn("User does not exist", { requestId, phone });
       res.status(403).send({
         status: false,
         message: "User does not exist",
       });
     }
   } catch (error) {
-    console.log(error);
+    childLogger.error("Failed to send verification code", {
+      requestId,
+      phone: req.body.phone,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
+
 const login = async (req, res) => {
+  const requestId = uuidv4();
   try {
-    let { email, password } = req.body;
-    let user = await User.findOne({
-      where: {
-        email,
-      },
+    childLogger.http("Received login request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      body: { email: req.body.email }, // Avoid logging password
     });
+
+    const { email, password } = req.body;
+    childLogger.debug("Request body", { requestId, email });
+
+    childLogger.info("Finding user by email", { requestId, email });
+    const user = await User.findOne({
+      where: { email },
+    });
+
     if (user) {
-      if (await bcrypt.compare(password, user.password)) {
+      childLogger.info("User found", { requestId, userId: user.id, email });
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (isPasswordValid) {
+        childLogger.info("Password verified, generating JWT", { requestId, userId: user.id });
         const token = generateJwtTokens(user);
+
+        childLogger.info("Login successful", { requestId, userId: user.id, email });
         successResponse(res, token);
       } else {
+        childLogger.warn("Incorrect password", { requestId, email });
         res.status(401).send({
           status: false,
           message: "Incorrect password",
         });
       }
     } else {
+      childLogger.warn("User does not exist", { requestId, email });
       res.status(403).send({
         status: false,
         message: "User does not exist",
       });
     }
   } catch (error) {
-    console.log(error);
+    childLogger.error("Failed to login", {
+      requestId,
+      email: req.body.email,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
+
 const verifyCode = async (req, res) => {
+  const requestId = uuidv4();
   try {
-    let { phone, passcode } = req.body;
-    let user = await checkIfUserExists(phone);
+    childLogger.http("Received verify code request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      body: req.body,
+    });
+
+    const { phone, passcode } = req.body;
+    childLogger.debug("Request body", { requestId, phone, passcode });
+
+    childLogger.info("Checking if user exists", { requestId, phone });
+    const user = await checkIfUserExists(phone);
     if (user) {
       if (user.passcode == passcode) {
-        const token = generateJwtTokens(user);
-        successResponse(res, token);
-        await user.update({
-          passcode: null,
+        childLogger.info("Verification code valid, generating JWT", {
+          requestId,
+          userId: user.id,
+          phone,
         });
+        const token = generateJwtTokens(user);
+
+        childLogger.info("Clearing passcode", { requestId, userId: user.id });
+        await user.update({ passcode: null });
+
+        childLogger.info("Code verification successful", {
+          requestId,
+          userId: user.id,
+          phone,
+        });
+        successResponse(res, token);
       } else {
+        childLogger.warn("Invalid verification code", { requestId, phone });
         res.status(401).send({
           status: false,
           message: "Invalid verification code",
         });
       }
     } else {
+      childLogger.warn("User does not exist", { requestId, phone });
       res.status(403).send({
         status: false,
         message: "User does not exist",
       });
     }
   } catch (error) {
-    console.log(error);
+    childLogger.error("Failed to verify code", {
+      requestId,
+      phone: req.body.phone,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
 
 const getUsers = async (req, res) => {
+  const requestId = uuidv4();
   try {
+    childLogger.http("Received get users request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      query: { limit: req.limit, offset: req.offset, keyword: req.keyword },
+    });
+
+    childLogger.info("Fetching users", {
+      requestId,
+      limit: req.limit,
+      offset: req.offset,
+      keyword: req.keyword,
+    });
     const response = await User.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -179,17 +368,46 @@ const getUsers = async (req, res) => {
       },
       include: [Shop],
     });
+
+    childLogger.info("Users fetched successfully", {
+      requestId,
+      count: response.count,
+      page: req.page,
+    });
     successResponse(res, {
       count: response.count,
       page: req.page,
       ...response,
     });
   } catch (error) {
+    childLogger.error("Failed to fetch users", {
+      requestId,
+      limit: req.limit,
+      offset: req.offset,
+      keyword: req.keyword,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
+
 const getSellers = async (req, res) => {
+  const requestId = uuidv4();
   try {
+    childLogger.http("Received get sellers request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      query: { limit: req.limit, offset: req.offset, keyword: req.keyword },
+    });
+
+    childLogger.info("Fetching sellers", {
+      requestId,
+      limit: req.limit,
+      offset: req.offset,
+      keyword: req.keyword,
+    });
     const response = await User.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -199,65 +417,189 @@ const getSellers = async (req, res) => {
         },
       },
     });
+
+    childLogger.info("Sellers fetched successfully", {
+      requestId,
+      count: response.count,
+      page: req.page,
+    });
     successResponse(res, {
       count: response.count,
       page: req.page,
       ...response,
     });
   } catch (error) {
+    childLogger.error("Failed to fetch sellers", {
+      requestId,
+      limit: req.limit,
+      offset: req.offset,
+      keyword: req.keyword,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
+
 const getUserInfo = async (req, res) => {
+  const requestId = uuidv4();
   try {
     const { id } = req.params;
+    childLogger.http("Received get user info request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      params: { id },
+    });
+
+    childLogger.info("Fetching user info", { requestId, userId: id });
     const user = await findUserByID(id);
+
+    if (!user) {
+      childLogger.warn("User not found", { requestId, userId: id });
+      return res.status(404).send({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    childLogger.info("User info fetched successfully", { requestId, userId: id });
     successResponse(res, user);
   } catch (error) {
+    childLogger.error("Failed to fetch user info", {
+      requestId,
+      userId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
 
 const getMyInfo = async (req, res) => {
+  const requestId = uuidv4();
   try {
     const user = req.user;
+    childLogger.http("Received get my info request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      userId: user.id,
+    });
+
+    childLogger.info("Fetching my info", { requestId, userId: user.id });
     const response = await findUserByID(user.id);
+
+    if (!response) {
+      childLogger.warn("User not found", { requestId, userId: user.id });
+      return res.status(404).send({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    childLogger.info("My info fetched successfully", { requestId, userId: user.id });
     successResponse(res, response);
   } catch (error) {
+    childLogger.error("Failed to fetch my info", {
+      requestId,
+      userId: req.user?.id,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
+
 const deleteUser = async (req, res) => {
+  const requestId = uuidv4();
   try {
     const { id } = req.params;
+    childLogger.http("Received delete user request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      params: { id },
+    });
+
+    childLogger.info("Fetching user for deletion", { requestId, userId: id });
     const user = await findUserByID(id);
+
+    if (!user) {
+      childLogger.warn("User not found", { requestId, userId: id });
+      return res.status(404).send({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    childLogger.info("Deleting user", { requestId, userId: id });
     const response = await user.destroy();
+
+    childLogger.info("User deleted successfully", { requestId, userId: id });
     successResponse(res, response);
   } catch (error) {
+    childLogger.error("Failed to delete user", {
+      requestId,
+      userId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
 
 const updateUser = async (req, res) => {
+  const requestId = uuidv4();
   try {
     const { id } = req.params;
+    childLogger.http("Received update user request", {
+      requestId,
+      method: req.method,
+      url: req.url,
+      params: { id },
+      body: req.body,
+    });
 
+    childLogger.debug("Request body", { requestId, body: req.body });
+
+    childLogger.info("Fetching user for update", { requestId, userId: id });
     const user = await findUserByID(id);
 
-    let url = await getUrl(req);
-    console.log(url, req.body);
-    if (url) {
-      req.body.image = url;
+    if (!user) {
+      childLogger.warn("User not found", { requestId, userId: id });
+      return res.status(404).send({
+        status: false,
+        message: "User not found",
+      });
     }
-    const response = await user.update({
-      ...req.body,
-    });
+
+    childLogger.info("Getting image URL", { requestId, userId: id });
+    const url = await getUrl(req);
+    childLogger.debug("Image URL", { requestId, userId: id, url });
+
+    const updateData = { ...req.body };
+    if (url) {
+      updateData.image = url;
+      childLogger.info("Image URL added to update data", { requestId, userId: id });
+    }
+
+    childLogger.info("Updating user", { requestId, userId: id });
+    const response = await user.update(updateData);
+
+    childLogger.info("User updated successfully", { requestId, userId: id });
     successResponse(res, response);
   } catch (error) {
-    console.log("Error here");
+    childLogger.error("Failed to update user", {
+      requestId,
+      userId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+    });
     errorResponse(res, error);
   }
 };
+
 module.exports = {
   findUserByID,
   getUsers,
@@ -271,4 +613,5 @@ module.exports = {
   sendVerificationCode,
   getMyInfo,
   updateUser,
+  getSellers,
 };
