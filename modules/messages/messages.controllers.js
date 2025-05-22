@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const { Message, Topic, Chat } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const { sendFCMNotification } = require("../../utils/send_notification");
 
 const findMessageByID = async (id) => {
   try {
@@ -27,7 +28,29 @@ const addMessage = async (req, res) => {
       imageUrl,
       type,
     });
+    const topic = await Topic.findOne({
+      include: [
+        {
+          model: Chat,
+          include: [User, { model: Shop, include: [User] }],
+        },
+      ],
+    });
+
     req.io.emit("receiveMessage", savedMessage);
+    if (from == "user") {
+      await sendFCMNotification({
+        title: `New Message from ${topic.Chat.User.name}`,
+        body: message,
+        token: topic.Chat.Shop.User.token,
+      });
+    } else {
+      await sendFCMNotification({
+        title: `New Message from ${topic.Chat.Shop.User.name}`,
+        body: message,
+        token: topic.Chat.User.token,
+      });
+    }
     successResponse(res, savedMessage);
   } catch (error) {
     console.log(error);

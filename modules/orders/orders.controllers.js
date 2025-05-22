@@ -181,7 +181,7 @@ const updateOrder = async (req, res) => {
     }
     if (payload.status == "CANCELED") {
       await sendFCMNotification({
-        title: `Seller has confirmed the order`,
+        title: `Seller has canceled the order`,
         body: `${order.Shop.name} seller has just canceled your order`,
         token: order.User.token,
       });
