@@ -17,11 +17,9 @@ const sendFCMNotification = async ({ title, body, data, token }) => {
 
   try {
     const response = await admin.messaging().send(message);
-    console.log("Successfully sent message:", response);
-    res.status(200).send("Notification sent successfully");
+    return response;
   } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).send("Error sending notification");
+    return error;
   }
 };
 
