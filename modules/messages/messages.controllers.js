@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Message, Topic, Chat } = require("../../models");
+const { Message, Topic, Chat, User, Shop } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { sendFCMNotification } = require("../../utils/send_notification");
