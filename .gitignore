@@ -9,3 +9,4 @@ package-lock.json
 .codegpt
 swagger-output.json
 logs/
+serviceAccountKey.json
