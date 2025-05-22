@@ -40,13 +40,13 @@ const addMessage = async (req, res) => {
     req.io.emit("receiveMessage", savedMessage);
     if (from == "user") {
       await sendFCMNotification({
-        title: `New Message from ${topic.Chat.User.name}`,
+        title: `${topic.Chat.User.name}`,
         body: message,
         token: topic.Chat.Shop.User.token,
       });
     } else {
       await sendFCMNotification({
-        title: `New Message from ${topic.Chat.Shop.User.name}`,
+        title: `${topic.Chat.Shop.name}`,
         body: message,
         token: topic.Chat.User.token,
       });
