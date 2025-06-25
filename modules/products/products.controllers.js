@@ -45,6 +45,29 @@ const findProductByID = async (id) => {
   }
 };
 
+/**
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: Add a new product
+ *     tags:
+ *       - Products
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewProduct'
+ *     responses:
+ *       200:
+ *         description: Product created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: Failed to create product
+ */
 const addProduct = async (req, res) => {
   const requestId = uuidv4();
   try {
@@ -113,6 +136,49 @@ const addProduct = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /products:
+ *   get:
+ *     summary: Get a list of products
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Successfully fetched products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 rows:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: Failed to fetch products
+ */
 const getProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
