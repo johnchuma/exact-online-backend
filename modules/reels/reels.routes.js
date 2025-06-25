@@ -13,9 +13,9 @@ const upload = require("../../utils/upload");
 const router = Router();
 
 router.post("/", upload.single("file"), validateJWT, addReel);
-router.get("/", validateJWT, getPagination, getReels);
-router.get("/shop/:id", validateJWT, getPagination, getShopReels);
-router.get("/:id", validateJWT, getReel);
+router.get("/",  getPagination, getReels);
+router.get("/shop/:id",  getPagination, getShopReels);
+router.get("/:id",  getReel);
 router.patch("/:id", validateJWT, updateReel);
 router.delete("/:id", validateJWT, deleteReel);
 

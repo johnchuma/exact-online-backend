@@ -10,6 +10,7 @@ const sendFCMNotification = async ({ title, body, data, token }) => {
     notification: {
       title: title || "Test Notification",
       body: body || "This is a test notification from your server!",
+  
     },
     data: data || {}, // Optional custom data
     token,
@@ -19,6 +20,7 @@ const sendFCMNotification = async ({ title, body, data, token }) => {
     const response = await admin.messaging().send(message);
     return response;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };

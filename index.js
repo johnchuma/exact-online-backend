@@ -81,6 +81,7 @@ const io = new Server(server, {
 const { errorResponse } = require("./utils/responses");
 const { scrapeResults } = require("./utils/scrapper");
 const logger = require("./utils/logger");
+const { sendFCMNotification } = require("./utils/send_notification");
 app.use("/files", express.static("files"));
 app.use("/extracted", express.static("extracted"));
 app.use(express.json());
@@ -152,6 +153,14 @@ app.get("/open-app", (req, res) => {
     errorResponse(res, error);
   }
 });
+
+app.get("/fcm",async(req,res)=>{
+var token = "er5-Sh1JQZu0rjM3dGDSCj:APA91bF9a3Wt3V8IKQScdw1OGJfi48ypJl_R0qr7Flb07pCWK90bMhnsu2e2JIh1OMcYyvKo0eRNn6a48AIZ7DcT3OHeHoK2_9G1z2TiZMzQEYLFpZw0DhI"
+var title = "testing deeplink";
+var body = "This is working fine";
+const response = await sendFCMNotification({title:title,body:body,token:token,data:{key:"here is the key"}})
+ res.status(200).send({status:true,response})
+})
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);

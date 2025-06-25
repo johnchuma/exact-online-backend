@@ -18,6 +18,7 @@ module.exports.validateJWT = async (req, res, next) => {
           code: 403,
           error: "Oops! You don't have access",
         });
+        
       req.user = user;
       next();
     });

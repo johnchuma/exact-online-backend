@@ -45,6 +45,8 @@ const addOrder = async (req, res) => {
       title: "You have a new order",
       body: `${from.name} has just placed an order.`,
       token: shop.User.token,
+      data:{type:"order",orderId:response.id,to:"shop"}
+
     });
     await sendSMS(
       shop.phone,
@@ -77,14 +79,27 @@ const getOrders = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.query;
+    let { status } = req.query;  
+    console.log(status)
+
+    if(status == "DELIVERED"){
+      status = ["DELIVERED","CLOSED"]
+    } 
+    else if(status == "NEW ORDER"){
+      status = ["NEW ORDER","IN PROGRESS","CONFIRMED","DELIVERED","CLOSED"]
+    }
+    else{
+      status = [status]
+    }
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       order: [["updatedAt", "DESC"]],
       where: {
         UserId: id,
-        status: status || "NEGOTIATION",
+        status: {
+          [Op.in]:status
+        },
       },
       include: [
         {
@@ -99,9 +114,11 @@ const getUserOrders = async (req, res) => {
         },
         {
           model: User,
+          required:true
         },
         {
           model: Shop,
+          required:true
         },
       ],
     });
@@ -111,19 +128,28 @@ const getUserOrders = async (req, res) => {
       ...response,
     });
   } catch (e) {
+    console.log(e)
     errorResponse(res, e); // Pass the error object directly
   }
 };
 const getShopOrders = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.query;
+    let { status } = req.query;  
+    if(status == "DELIVERED"){
+      status = ["DELIVERED","CLOSED"]
+    } 
+    else{
+      status = [status]
+    }
     const response = await Order.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       order: [["updatedAt", "DESC"]],
       where: {
-        status: status || "NEGOTIATION",
+        status: {
+          [Op.in]:status
+        },
       },
       include: [
         {
@@ -148,6 +174,7 @@ const getShopOrders = async (req, res) => {
       ...response,
     });
   } catch (error) {
+    console.log(error)
     errorResponse(res, error);
   }
 };
@@ -163,6 +190,12 @@ const getOrder = async (req, res) => {
 const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
+    const user = await User.findOne({
+      where:{
+        id:req.user.id
+      }
+    })
+
     const payload = req.body;
     const order = await findOrderByID(id);
     if (payload.status == "IN PROGRESS") {
@@ -170,6 +203,7 @@ const updateOrder = async (req, res) => {
         title: `${order.User.name} confirmed the price`,
         body: `${order.User.name} has just confirmed the price after negotiation`,
         token: order.Shop.User.token,
+        data:{type:"order",orderId:order.id,to:"shop"}
       });
     }
     if (payload.status == "CONFIRMED") {
@@ -177,13 +211,31 @@ const updateOrder = async (req, res) => {
         title: `Seller has confirmed the order`,
         body: `${order.Shop.name} seller has just confirmed your order`,
         token: order.User.token,
+        data:{type:"order",orderId:order.id,to:"user"}
       });
     }
     if (payload.status == "CANCELED") {
       await sendFCMNotification({
-        title: `Seller has canceled the order`,
-        body: `${order.Shop.name} seller has just canceled your order`,
+        title: `Order cancellation`,
+        body: `${user.name} has just canceled an order`,
+        token: user.token,
+        data:{type:"order",orderId:order.id,to:"shop"}
+      });
+    }
+    if (payload.status == "DELIVERED") {
+      await sendFCMNotification({
+        title: `Order is delivered successfully`,
+        body: `Your order is marked as delivered`,
         token: order.User.token,
+        data:{type:"order",orderId:order.id,to:"user"}
+      });
+    }
+    if (payload.status == "CLOSED") {
+      await sendFCMNotification({
+        title: `Customer confirmed delivery`,
+        body: `Customer has just confirmed that they got their order`,
+        token: order.Shop.User.token,
+        data:{type:"order",orderId:order.id,to:"shop"}
       });
     }
     const response = await order.update(payload);

@@ -80,7 +80,7 @@ const addProduct = async (req, res) => {
     });
     const response = await Product.create({
       name,
-      sellingPrice,
+      sellingPrice:`${sellingPrice}`.replace(",",""),
       priceIncludeDelivery,
       deliveryScope,
       productLink,
@@ -147,7 +147,10 @@ const getProducts = async (req, res) => {
       where: filter,
       include: [
         ProductImage,
-        Shop,
+        {
+          model:Shop,
+          required:true
+        },
         ProductStat,
         ProductReview,
         {
@@ -210,7 +213,10 @@ const getNewArrivalProducts = async (req, res) => {
       order: [["createdAt", "DESC"]],
       include: [
         ProductImage,
-        Shop,
+        {
+          model:Shop,
+          required:true
+        },
         ProductStat,
         ProductReview,
         {
@@ -306,7 +312,10 @@ const getProductsForYou = async (req, res) => {
       },
       include: [
         ProductImage,
-        Shop,
+        {
+          model:Shop,
+          required:true
+        },
         ProductStat,
         ProductReview,
         {
@@ -450,6 +459,10 @@ const getRelatedProducts = async (req, res) => {
       },
       include: [
         ProductImage,
+        {
+          model:Shop,
+          required:true
+        },
         ProductStat,
         ProductReview,
         {
