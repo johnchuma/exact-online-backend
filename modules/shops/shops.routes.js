@@ -15,14 +15,15 @@ const upload = require("../../utils/upload");
 const router = Router();
 
 router.post("/", validateJWT, addShop);
-router.get("/",  getPagination, getShops);
-router.get("/user/:id",  getPagination, getUserShops);
+router.get("/",validateJWT,  getPagination, getShops);
+router.get("/user/:id", validateJWT, getPagination, getUserShops);
 router.get(
   "/following/user/:id",
+  validateJWT,
   getPagination,
   getUserShopFollowings
 );
-router.get("/:id",  getShop);
+router.get("/:id", validateJWT, getShop);
 router.patch("/:id", upload.single("file"), validateJWT, updateShop);
 router.delete("/:id", validateJWT, deleteShop);
 

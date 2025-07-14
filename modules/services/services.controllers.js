@@ -202,7 +202,15 @@ const getService = async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.user;
-    const service = await Service.findOne({
+    let includes = []
+    if(user){
+      includes.push({
+              model: ShopFollower,
+              where: { UserId: user.id },
+              required: false
+            })
+    }
+    let options  = {
       where: {
         id,
       },
@@ -222,16 +230,14 @@ const getService = async (req, res) => {
               'following'
             ],
           ]},
-          include: [
-            {
-              model: ShopFollower,
-              where: { UserId: user.id },
-              required: false
-            }
-          ]
+          include:includes
       }],
-      replacements: { userId: user.id }
-    });
+     
+    }
+    if(user){
+      options.replacements = { userId: user.id };
+    }
+    const service = await Service.findOne(options);
     successResponse(res, service);
   } catch (error) {
     console.log(error);

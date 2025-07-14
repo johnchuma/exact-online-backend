@@ -198,33 +198,27 @@ const getProducts = async (req, res) => {
     if (category && category !== "All") {
       filter.CategoryId = category;
     }
-    childLogger.debug("Applying filter", { requestId, filter });
-
-    childLogger.info("Fetching products", {
-      requestId,
-      category,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-    });
-    const response = await Product.findAndCountAll({
-      limit: req.limit,
-      offset: req.offset,
-      where: filter,
-      include: [
+   let includes = [
         ProductImage,
         {
           model:Shop,
           required:true
         },
         ProductStat,
-        ProductReview,
-        {
+        ProductReview
+      ]
+      if(req.user){
+        includes.push({
           model: Favorite,
           where: { UserId: req.user.id },
           required: false,
-        },
-      ],
+        });
+      }
+    const response = await Product.findAndCountAll({
+      limit: req.limit,
+      offset: req.offset,
+      where: filter,
+      include: includes
     });
 
     childLogger.info("Products fetched successfully", {
@@ -239,15 +233,7 @@ const getProducts = async (req, res) => {
       ...response,
     });
   } catch (error) {
-    childLogger.error("Failed to fetch products", {
-      requestId,
-      category: req.query.category,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-      error: error.message,
-      stack: error.stack,
-    });
+   
     errorResponse(res, error);
   }
 };
@@ -255,19 +241,23 @@ const getProducts = async (req, res) => {
 const getNewArrivalProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
-    childLogger.http("Received get new arrival products request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      query: { keyword: req.keyword, limit: req.limit, offset: req.offset },
-    });
-
-    childLogger.info("Fetching new arrival products", {
-      requestId,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-    });
+   let includes = [
+        ProductImage,
+        {
+          model:Shop,
+          required:true
+        },
+        ProductStat,
+        ProductReview,
+       
+      ]
+      if(req.user){
+        includes.push({
+          model: Favorite,
+          where: { UserId: req.user.id },
+          required: false,
+        });
+      }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -277,20 +267,7 @@ const getNewArrivalProducts = async (req, res) => {
         },
       },
       order: [["createdAt", "DESC"]],
-      include: [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview,
-        {
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        },
-      ],
+      include: includes,
     });
 
     childLogger.info("New arrival products fetched successfully", {
@@ -352,22 +329,22 @@ const getProductSearch = async (req, res) => {
 const getProductsForYou = async (req, res) => {
   const requestId = uuidv4();
   try {
-    const { id } = req.user;
-    childLogger.http("Received get products for you request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      query: { keyword: req.keyword, limit: req.limit, offset: req.offset },
-      userId: id,
-    });
-
-    childLogger.info("Fetching products for user", {
-      requestId,
-      userId: id,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-    });
+    let includes = [
+        ProductImage,
+        {
+          model:Shop,
+          required:true
+        },
+        ProductStat,
+        ProductReview
+      ]
+      if(req.user){
+        includes.push({
+          model: Favorite,
+          where: { UserId: req.user.id },
+          required: false,
+        });
+      }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -376,43 +353,17 @@ const getProductsForYou = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include: [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview,
-        {
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        },
-      ],
+      include:includes,
     });
 
-    childLogger.info("Products for user fetched successfully", {
-      requestId,
-      userId: id,
-      count: response.count,
-      page: req.page,
-    });
+   
     successResponse(res, {
       count: response.count,
       page: req.page,
       ...response,
     });
   } catch (error) {
-    childLogger.error("Failed to fetch products for user", {
-      requestId,
-      userId: req.user?.id,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-      error: error.message,
-      stack: error.stack,
-    });
+   
     errorResponse(res, error);
   }
 };
@@ -421,21 +372,22 @@ const getShopProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
     const { id } = req.params;
-    childLogger.http("Received get shop products request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      params: { id },
-      query: { keyword: req.keyword, limit: req.limit, offset: req.offset },
-    });
-
-    childLogger.info("Fetching shop products", {
-      requestId,
-      shopId: id,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-    });
+    let includes = [
+        ProductImage,
+        {
+          model:Shop,
+          required:true
+        },
+        ProductStat,
+        ProductReview
+      ]
+      if(req.user){
+        includes.push({
+          model: Favorite,
+          where: { UserId: req.user.id },
+          required: false,
+        });
+      }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -445,16 +397,7 @@ const getShopProducts = async (req, res) => {
         },
         ShopId: id,
       },
-      include: [
-        ProductImage,
-        ProductStat,
-        ProductReview,
-        {
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        },
-      ],
+      include:includes
     });
 
     childLogger.info("Shop products fetched successfully", {
@@ -486,15 +429,7 @@ const getRelatedProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
     const { id } = req.params;
-    childLogger.http("Received get related products request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      params: { id },
-      query: { keyword: req.keyword, limit: req.limit, offset: req.offset },
-    });
-
-    childLogger.info("Fetching product for related products", { requestId, productId: id });
+    
     const product = await findProductByID(id);
 
     if (!product) {
@@ -505,14 +440,22 @@ const getRelatedProducts = async (req, res) => {
       });
     }
 
-    childLogger.info("Fetching related products", {
-      requestId,
-      productId: id,
-      CategoryId: product.CategoryId,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-    });
+     let includes = [
+        ProductImage,
+        {
+          model:Shop,
+          required:true
+        },
+        ProductStat,
+        ProductReview
+      ]
+      if(req.user){
+        includes.push({
+          model: Favorite,
+          where: { UserId: req.user.id },
+          required: false,
+        });
+      }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -523,20 +466,7 @@ const getRelatedProducts = async (req, res) => {
         id: { [Op.ne]: id },
         CategoryId: product.CategoryId,
       },
-      include: [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview,
-        {
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        },
-      ],
+      include:includes,
     });
 
     childLogger.info("Related products fetched successfully", {
@@ -570,23 +500,8 @@ const getProduct = async (req, res) => {
   try {
     const user = req.user;
     const { id } = req.params;
-    childLogger.http("Received get product request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      params: { id },
-      userId: user.id,
-    });
-
-    childLogger.info("Fetching product", { requestId, productId: id, userId: user.id });
-    const product = await Product.findOne({
-      where: { id },
-      include: [
-        {
-          model: CartProduct,
-          where: { UserId: user.id },
-          required: false,
-        },
+     let includes = [
+     
         ProductImage,
         ProductStat,
         {
@@ -594,8 +509,15 @@ const getProduct = async (req, res) => {
           required: false,
           description: { [Op.ne]: null },
           include: [User],
-        },
-        {
+        }
+      ]
+      if(req.user){
+        includes.push(  {
+          model: CartProduct,
+          where: { UserId: user.id },
+          required: false,
+        })
+        includes.push(   {
           model: Shop,
           attributes: {
             include: [
@@ -619,34 +541,32 @@ const getProduct = async (req, res) => {
               required: false,
             },
           ],
-        },
-        {
+        })
+        includes.push({
           model: Favorite,
-          where: { UserId: user.id },
+          where: { UserId: req.user.id },
           required: false,
-        },
-      ],
-      replacements: { userId: user.id },
-    });
+        });
+      }
+      let options = {
+      where: { id },
+      include: includes,
+    }
+    if(user){
+      options.replacements = { userId: user.id };
+    }
+    const product = await Product.findOne(options);
 
     if (!product) {
-      childLogger.warn("Product not found", { requestId, productId: id, userId: user.id });
       return res.status(404).send({
         status: false,
         message: "Product not found",
       });
     }
 
-    childLogger.info("Product fetched successfully", { requestId, productId: id, userId: user.id });
     successResponse(res, product);
   } catch (error) {
-    childLogger.error("Failed to fetch product", {
-      requestId,
-      productId: req.params.id,
-      userId: req.user?.id,
-      error: error.message,
-      stack: error.stack,
-    });
+ 
     errorResponse(res, error);
   }
 };

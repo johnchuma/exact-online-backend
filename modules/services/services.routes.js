@@ -18,18 +18,19 @@ const { getPagination } = require("../../utils/getPagination");
 const router = Router();
 
 router.post("/", validateJWT, addService);
-router.get("/",  getPagination, getServices);
-router.get("/new", getPagination, getNewArrivalServices);
-router.get("/search/:keyword",  getServiceSearch);
-router.get("/for-you",  getPagination, getServicesForYou);
-router.get("/popular",  getPagination, getPopularServices);
-router.get("/shop/:id",  getPagination, getShopServices);
+router.get("/",  validateJWT, getPagination, getServices);
+router.get("/new", validateJWT, getPagination, getNewArrivalServices);
+router.get("/search/:keyword", validateJWT,  getServiceSearch);
+router.get("/for-you", validateJWT,  getPagination, getServicesForYou);
+router.get("/popular", validateJWT,  getPagination, getPopularServices);
+router.get("/shop/:id", validateJWT,  getPagination, getShopServices);
 router.get(
   "/related/service/:id",
+   validateJWT,
   getPagination,
   getRelatedServices
 );
-router.get("/:id",  getService);
+router.get("/:id",  validateJWT, getService);
 router.patch("/:id", validateJWT, updateService);
 router.delete("/:id", validateJWT, deleteService);
 
