@@ -1,5 +1,11 @@
-const { Op,Sequelize } = require("sequelize");
-const { Service, ServiceImage,ShopFollower, Shop } = require("../../models");
+const { Op, Sequelize } = require("sequelize");
+const {
+  Service,
+  ServiceImage,
+  ShopFollower,
+  Shop,
+  User,
+} = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 
 const findServiceByID = async (id) => {
@@ -157,10 +163,12 @@ const getShopServices = async (req, res) => {
         },
         ShopId: id,
       },
-      include: [{
-        model:ServiceImage,
-        required:true
-      }],
+      include: [
+        {
+          model: ServiceImage,
+          required: true,
+        },
+      ],
     });
     successResponse(res, {
       count: response.count,
@@ -182,8 +190,8 @@ const getRelatedServices = async (req, res) => {
         name: {
           [Op.like]: `%${req.keyword}%`,
         },
-        id:{
-          [Op.ne]:id
+        id: {
+          [Op.ne]: id,
         },
       },
       include: [ServiceImage],
@@ -202,41 +210,40 @@ const getService = async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.user;
-    let includes = []
-    if(user){
+    let includes = [];
+    if (user) {
       includes.push({
-              model: ShopFollower,
-              where: { UserId: user.id },
-              required: false
-            })
+        model: ShopFollower,
+        where: { UserId: user.id },
+        required: false,
+      });
     }
-    let options  = {
+    let options = {
       where: {
         id,
       },
-      include: [ServiceImage, {
-        model:Shop,
-        attributes: {
-          include: [
-            [
-              Sequelize.literal(`
-                EXISTS (
-                  SELECT 1
-                  FROM "ShopFollowers"
-                  WHERE "ShopFollowers"."UserId" = :userId
-                  AND "ShopFollowers"."ShopId" = "Shop"."id"
-                )
-              `),
-              'following'
-            ],
-          ]},
-          include:includes
-      }],
-     
-    }
-    if(user){
-      options.replacements = { userId: user.id };
-    }
+      include: [
+        ServiceImage,
+        {
+          model: Shop,
+          attributes: {
+            include: user
+              ? [
+                  [
+                    Sequelize.literal(`EXISTS (
+                        SELECT 1
+                        FROM "ShopFollowers"
+                        WHERE "ShopFollowers"."UserId" = '${user.id}'
+                        AND "ShopFollowers"."ShopId" = "Shop"."id")`),
+                    "following",
+                  ],
+                ]
+              : [[Sequelize.literal("false"), "following"]],
+          },
+          include: includes,
+        },
+      ],
+    };
     const service = await Service.findOne(options);
     successResponse(res, service);
   } catch (error) {

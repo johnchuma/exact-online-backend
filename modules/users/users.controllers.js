@@ -27,7 +27,11 @@ const addUser = async (req, res) => {
     childLogger.info("Checking if user exists", { requestId, phone });
     const user = await checkIfUserExists(phone);
     if (user) {
-      childLogger.warn("Phone number already used", { requestId, phone, userId: user.id });
+      childLogger.warn("Phone number already used", {
+        requestId,
+        phone,
+        userId: user.id,
+      });
       return res.status(403).send({
         status: false,
         message: "Phone number is already used",
@@ -193,7 +197,11 @@ const sendVerificationCode = async (req, res) => {
     const user = await checkIfUserExists(phone);
     if (user) {
       const code = randomNumber();
-      childLogger.info("Generated verification code", { requestId, phone, code });
+      childLogger.info("Generated verification code", {
+        requestId,
+        phone,
+        code,
+      });
 
       childLogger.info("Sending verification SMS", { requestId, phone });
       await sendSMS(
@@ -201,7 +209,11 @@ const sendVerificationCode = async (req, res) => {
         `Dear ${user.name},\nyour verification code is ${code}, Enter this code in the form to proceed with the app. \n\nThank you`
       );
 
-      childLogger.info("Updating user with verification code", { requestId, userId: user.id });
+      childLogger.info("Updating user with verification code", {
+        requestId,
+        userId: user.id,
+      });
+      console.log(code)
       await user.update({ passcode: code });
 
       childLogger.info("Verification code sent successfully", {
@@ -254,10 +266,17 @@ const login = async (req, res) => {
       childLogger.info("User found", { requestId, userId: user.id, email });
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
-        childLogger.info("Password verified, generating JWT", { requestId, userId: user.id });
+        childLogger.info("Password verified, generating JWT", {
+          requestId,
+          userId: user.id,
+        });
         const token = generateJwtTokens(user);
 
-        childLogger.info("Login successful", { requestId, userId: user.id, email });
+        childLogger.info("Login successful", {
+          requestId,
+          userId: user.id,
+          email,
+        });
         successResponse(res, token);
       } else {
         childLogger.warn("Incorrect password", { requestId, email });
@@ -285,59 +304,28 @@ const login = async (req, res) => {
 };
 
 const verifyCode = async (req, res) => {
-  const requestId = uuidv4();
   try {
-    childLogger.http("Received verify code request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      body: req.body,
-    });
-
     const { phone, passcode } = req.body;
-    childLogger.debug("Request body", { requestId, phone, passcode });
-
-    childLogger.info("Checking if user exists", { requestId, phone });
+    console.log(req.body);
     const user = await checkIfUserExists(phone);
     if (user) {
       if (user.passcode == passcode) {
-        childLogger.info("Verification code valid, generating JWT", {
-          requestId,
-          userId: user.id,
-          phone,
-        });
         const token = generateJwtTokens(user);
-
-        childLogger.info("Clearing passcode", { requestId, userId: user.id });
-        await user.update({ passcode: null });
-
-        childLogger.info("Code verification successful", {
-          requestId,
-          userId: user.id,
-          phone,
-        });
+        console.log("token", token);
         successResponse(res, token);
       } else {
-        childLogger.warn("Invalid verification code", { requestId, phone });
         res.status(401).send({
           status: false,
           message: "Invalid verification code",
         });
       }
     } else {
-      childLogger.warn("User does not exist", { requestId, phone });
       res.status(403).send({
         status: false,
         message: "User does not exist",
       });
     }
   } catch (error) {
-    childLogger.error("Failed to verify code", {
-      requestId,
-      phone: req.body.phone,
-      error: error.message,
-      stack: error.stack,
-    });
     errorResponse(res, error);
   }
 };
@@ -463,7 +451,10 @@ const getUserInfo = async (req, res) => {
       });
     }
 
-    childLogger.info("User info fetched successfully", { requestId, userId: id });
+    childLogger.info("User info fetched successfully", {
+      requestId,
+      userId: id,
+    });
     successResponse(res, user);
   } catch (error) {
     childLogger.error("Failed to fetch user info", {
@@ -498,7 +489,10 @@ const getMyInfo = async (req, res) => {
       });
     }
 
-    childLogger.info("My info fetched successfully", { requestId, userId: user.id });
+    childLogger.info("My info fetched successfully", {
+      requestId,
+      userId: user.id,
+    });
     successResponse(res, response);
   } catch (error) {
     childLogger.error("Failed to fetch my info", {
@@ -581,7 +575,10 @@ const updateUser = async (req, res) => {
     const updateData = { ...req.body };
     if (url) {
       updateData.image = url;
-      childLogger.info("Image URL added to update data", { requestId, userId: id });
+      childLogger.info("Image URL added to update data", {
+        requestId,
+        userId: id,
+      });
     }
 
     childLogger.info("Updating user", { requestId, userId: id });

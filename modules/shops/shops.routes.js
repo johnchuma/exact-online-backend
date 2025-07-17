@@ -15,7 +15,7 @@ const upload = require("../../utils/upload");
 const router = Router();
 
 router.post("/", validateJWT, addShop);
-router.get("/",validateJWT,  getPagination, getShops);
+router.get("/", validateJWT, getPagination, getShops);
 router.get("/user/:id", validateJWT, getPagination, getUserShops);
 router.get(
   "/following/user/:id",

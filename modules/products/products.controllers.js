@@ -26,7 +26,12 @@ const findProductByID = async (id) => {
     childLogger.info("Finding product by ID", { requestId, productId: id });
     const product = await Product.findOne({
       where: { id },
-      include: [ProductImage, ProductStat, { model: ProductReview, include: [User] }, Shop],
+      include: [
+        ProductImage,
+        ProductStat,
+        { model: ProductReview, include: [User] },
+        Shop,
+      ],
     });
     if (!product) {
       childLogger.warn("Product not found", { requestId, productId: id });
@@ -103,7 +108,7 @@ const addProduct = async (req, res) => {
     });
     const response = await Product.create({
       name,
-      sellingPrice:`${sellingPrice}`.replace(",",""),
+      sellingPrice: `${sellingPrice}`.replace(",", ""),
       priceIncludeDelivery,
       deliveryScope,
       productLink,
@@ -187,7 +192,12 @@ const getProducts = async (req, res) => {
       requestId,
       method: req.method,
       url: req.url,
-      query: { category, keyword: req.keyword, limit: req.limit, offset: req.offset },
+      query: {
+        category,
+        keyword: req.keyword,
+        limit: req.limit,
+        offset: req.offset,
+      },
     });
 
     let filter = {
@@ -198,27 +208,27 @@ const getProducts = async (req, res) => {
     if (category && category !== "All") {
       filter.CategoryId = category;
     }
-   let includes = [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview
-      ]
-      if(req.user){
-        includes.push({
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        });
-      }
+    let includes = [
+      ProductImage,
+      {
+        model: Shop,
+        required: true,
+      },
+      ProductStat,
+      ProductReview,
+    ];
+    if (req.user) {
+      includes.push({
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      });
+    }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
       where: filter,
-      include: includes
+      include: includes,
     });
 
     childLogger.info("Products fetched successfully", {
@@ -233,7 +243,6 @@ const getProducts = async (req, res) => {
       ...response,
     });
   } catch (error) {
-   
     errorResponse(res, error);
   }
 };
@@ -241,23 +250,22 @@ const getProducts = async (req, res) => {
 const getNewArrivalProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
-   let includes = [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview,
-       
-      ]
-      if(req.user){
-        includes.push({
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        });
-      }
+    let includes = [
+      ProductImage,
+      {
+        model: Shop,
+        required: true,
+      },
+      ProductStat,
+      ProductReview,
+    ];
+    if (req.user) {
+      includes.push({
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      });
+    }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -313,7 +321,11 @@ const getProductSearch = async (req, res) => {
       },
     });
 
-    childLogger.info("Product search completed", { requestId, keyword, count: response.length });
+    childLogger.info("Product search completed", {
+      requestId,
+      keyword,
+      count: response.length,
+    });
     successResponse(res, response);
   } catch (error) {
     childLogger.error("Failed to search products", {
@@ -330,21 +342,21 @@ const getProductsForYou = async (req, res) => {
   const requestId = uuidv4();
   try {
     let includes = [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview
-      ]
-      if(req.user){
-        includes.push({
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        });
-      }
+      ProductImage,
+      {
+        model: Shop,
+        required: true,
+      },
+      ProductStat,
+      ProductReview,
+    ];
+    if (req.user) {
+      includes.push({
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      });
+    }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -353,17 +365,15 @@ const getProductsForYou = async (req, res) => {
           [Op.like]: `%${req.keyword}%`,
         },
       },
-      include:includes,
+      include: includes,
     });
 
-   
     successResponse(res, {
       count: response.count,
       page: req.page,
       ...response,
     });
   } catch (error) {
-   
     errorResponse(res, error);
   }
 };
@@ -373,21 +383,21 @@ const getShopProducts = async (req, res) => {
   try {
     const { id } = req.params;
     let includes = [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview
-      ]
-      if(req.user){
-        includes.push({
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        });
-      }
+      ProductImage,
+      {
+        model: Shop,
+        required: true,
+      },
+      ProductStat,
+      ProductReview,
+    ];
+    if (req.user) {
+      includes.push({
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      });
+    }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -397,7 +407,7 @@ const getShopProducts = async (req, res) => {
         },
         ShopId: id,
       },
-      include:includes
+      include: includes,
     });
 
     childLogger.info("Shop products fetched successfully", {
@@ -429,7 +439,7 @@ const getRelatedProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
     const { id } = req.params;
-    
+
     const product = await findProductByID(id);
 
     if (!product) {
@@ -440,22 +450,22 @@ const getRelatedProducts = async (req, res) => {
       });
     }
 
-     let includes = [
-        ProductImage,
-        {
-          model:Shop,
-          required:true
-        },
-        ProductStat,
-        ProductReview
-      ]
-      if(req.user){
-        includes.push({
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        });
-      }
+    let includes = [
+      ProductImage,
+      {
+        model: Shop,
+        required: true,
+      },
+      ProductStat,
+      ProductReview,
+    ];
+    if (req.user) {
+      includes.push({
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      });
+    }
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -466,7 +476,7 @@ const getRelatedProducts = async (req, res) => {
         id: { [Op.ne]: id },
         CategoryId: product.CategoryId,
       },
-      include:includes,
+      include: includes,
     });
 
     childLogger.info("Related products fetched successfully", {
@@ -496,65 +506,64 @@ const getRelatedProducts = async (req, res) => {
 };
 
 const getProduct = async (req, res) => {
-  const requestId = uuidv4();
   try {
     const user = req.user;
     const { id } = req.params;
-     let includes = [
-     
-        ProductImage,
-        ProductStat,
-        {
-          model: ProductReview,
-          required: false,
-          description: { [Op.ne]: null },
-          include: [User],
-        }
-      ]
-      if(req.user){
-        includes.push(  {
-          model: CartProduct,
-          where: { UserId: user.id },
-          required: false,
-        })
-        includes.push(   {
-          model: Shop,
-          attributes: {
-            include: [
-              [
-                Sequelize.literal(`
+    let includes = [
+      ProductImage,
+      ProductStat,
+      {
+        model: ProductReview,
+        required: false,
+        description: { [Op.ne]: null },
+        include: [User],
+      },
+    ];
+    console.log("fetch product by id", id);
+    console.log("user", user);
+    if (user) {
+      includes.push({
+        model: CartProduct,
+        where: { UserId: user.id },
+        required: false,
+      });
+      //adding shop and favorite details
+
+      includes.push({
+        model: Shop,
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(`
                   EXISTS (
                     SELECT 1
                     FROM "ShopFollowers"
-                    WHERE "ShopFollowers"."UserId" = :userId
+                    WHERE "ShopFollowers"."UserId" = '${user.id}'
                     AND "ShopFollowers"."ShopId" = "Shop"."id"
                   )
                 `),
-                "following",
-              ],
+              "following",
             ],
-          },
-          include: [
-            {
-              model: ShopFollower,
-              where: { UserId: user.id },
-              required: false,
-            },
           ],
-        })
-        includes.push({
-          model: Favorite,
-          where: { UserId: req.user.id },
-          required: false,
-        });
-      }
-      let options = {
+        },
+        include: [
+          {
+            model: ShopFollower,
+            where: { UserId: user.id },
+            required: false,
+          },
+        ],
+      });
+      includes.push({
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      });
+    }
+    let options = {
       where: { id },
       include: includes,
-    }
-    if(user){
-      options.replacements = { userId: user.id };
-    }
+    };
     const product = await Product.findOne(options);
 
     if (!product) {
@@ -566,7 +575,6 @@ const getProduct = async (req, res) => {
 
     successResponse(res, product);
   } catch (error) {
- 
     errorResponse(res, error);
   }
 };
@@ -585,7 +593,10 @@ const updateProduct = async (req, res) => {
 
     childLogger.debug("Request body", { requestId, body: req.body });
 
-    childLogger.info("Fetching product for update", { requestId, productId: id });
+    childLogger.info("Fetching product for update", {
+      requestId,
+      productId: id,
+    });
     const product = await findProductByID(id);
 
     if (!product) {
@@ -601,7 +612,10 @@ const updateProduct = async (req, res) => {
       ...req.body,
     });
 
-    childLogger.info("Product updated successfully", { requestId, productId: id });
+    childLogger.info("Product updated successfully", {
+      requestId,
+      productId: id,
+    });
     successResponse(res, response);
   } catch (error) {
     childLogger.error("Failed to update product", {
@@ -625,7 +639,10 @@ const deleteProduct = async (req, res) => {
       params: { id },
     });
 
-    childLogger.info("Fetching product for deletion", { requestId, productId: id });
+    childLogger.info("Fetching product for deletion", {
+      requestId,
+      productId: id,
+    });
     const product = await findProductByID(id);
 
     if (!product) {
@@ -639,7 +656,10 @@ const deleteProduct = async (req, res) => {
     childLogger.info("Deleting product", { requestId, productId: id });
     const response = await product.destroy();
 
-    childLogger.info("Product deleted successfully", { requestId, productId: id });
+    childLogger.info("Product deleted successfully", {
+      requestId,
+      productId: id,
+    });
     successResponse(res, response);
   } catch (error) {
     childLogger.error("Failed to delete product", {

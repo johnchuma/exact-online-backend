@@ -1,4 +1,4 @@
-const { Op, fn ,Sequelize} = require("sequelize");
+const { Op, fn, Sequelize } = require("sequelize");
 const {
   Shop,
   ShopCalender,
@@ -20,7 +20,7 @@ const findShopByID = async (id) => {
       where: {
         id,
       },
-      include:[ShopCalender,ShopSubscription,ShopView]
+      include: [ShopCalender, ShopSubscription, ShopView],
     });
     return shop;
   } catch (error) {
@@ -57,7 +57,6 @@ const getShops = async (req, res) => {
         },
       },
       include: [ShopDocument, ShopFollower],
-    
     });
 
     successResponse(res, {
@@ -69,7 +68,6 @@ const getShops = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
 
 const getUserShops = async (req, res) => {
   try {
@@ -114,7 +112,7 @@ const getUserShopFollowings = async (req, res) => {
       include: [
         {
           model: ShopFollower,
-          attributes:[],
+          attributes: [],
           where: {
             UserId: id,
           },
@@ -151,8 +149,8 @@ const getShop = async (req, res) => {
       where: {
         id,
       },
-     
-      attributes:{
+
+      attributes: {
         include: [
           [
             Sequelize.literal(
@@ -183,7 +181,7 @@ const getShop = async (req, res) => {
                 AND "ProductStats"."type" = 'view'
               )
             `),
-            "impressions" 
+            "impressions",
           ],
           [
             Sequelize.literal(`
@@ -195,7 +193,7 @@ const getShop = async (req, res) => {
                 AND "ProductStats"."type" = 'share'
               )
             `),
-            "shares" 
+            "shares",
           ],
           [
             Sequelize.literal(`
@@ -207,7 +205,7 @@ const getShop = async (req, res) => {
                 AND "ProductStats"."type" = 'call'
               )
             `),
-            "calls" 
+            "calls",
           ],
           [
             Sequelize.literal(`
@@ -217,7 +215,7 @@ const getShop = async (req, res) => {
                 WHERE "ShopViews"."ShopId" = "Shop"."id"
               )
             `),
-            "profileViews" 
+            "profileViews",
           ],
           [
             Sequelize.literal(`
@@ -229,39 +227,40 @@ const getShop = async (req, res) => {
                 AND "ReelStats"."type" = 'like'
               )
             `),
-            "reelLikes"
-          ], 
+            "reelLikes",
+          ],
           [
-                        Sequelize.literal(`
+            Sequelize.literal(`
                           EXISTS (
                             SELECT 1
                             FROM "ShopFollowers"
-                            WHERE "ShopFollowers"."UserId" = :userId
+                            WHERE "ShopFollowers"."UserId" = '${user.id}'
                             AND "ShopFollowers"."ShopId" = "Shop"."id"
                           )
                         `),
-                        'following'
-                      ],         
+            "following",
+          ],
         ],
       },
-      include:[
+      include: [
         {
           model: ShopFollower,
           where: { UserId: user.id },
-          required: false
+          required: false,
         },
-        ShopCalender,{
-        model:ShopSubscription,
-        include:[Subscription],
-        where:{
-          expireDate:{
-            [Op.gt]:Date.now()
-          }
+        ShopCalender,
+        {
+          model: ShopSubscription,
+          include: [Subscription],
+          where: {
+            expireDate: {
+              [Op.gt]: Date.now(),
+            },
+          },
+          required: false,
         },
-        required:false
-      },ShopView,],
-      replacements: { userId: user.id }
-
+        ShopView,
+      ],
     });
     successResponse(res, shop);
   } catch (error) {

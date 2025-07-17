@@ -1,5 +1,9 @@
-const { Op } = require("sequelize");
-const { Category, CategoryProductSpecification } = require("../../models");
+const { Op, Sequelize } = require("sequelize");
+const {
+  Category,
+  CategoryProductSpecification,
+  Product,
+} = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -34,20 +38,39 @@ const addCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
   try {
-    const {type} = req.query;
+    const { type } = req.query;
     let options = {
       name: {
         [Op.like]: `%${req.keyword}%`,
-      }
+      },
+    };
+    if (type) {
+      options.type = type == "null" ? "product" : type;
     }
-    if(type){
-      options.type = type =="null"?"product":type
-    }
+
     const response = await Category.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where:options,
+      where: options,
+      attributes: [
+        "id",
+        "name",
+        "type",
+        "image",
+        "createdAt",
+        "updatedAt",
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM "Products"
+            WHERE "Products"."CategoryId" = "Category"."id"
+          )`),
+          "productsCount",
+        ],
+      ],
+      order: [["createdAt", "DESC"]],
     });
+
     successResponse(res, {
       count: response.count,
       page: req.page,

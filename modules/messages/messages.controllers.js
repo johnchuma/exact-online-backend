@@ -20,6 +20,12 @@ const findMessageByID = async (id) => {
 const addMessage = async (req, res) => {
   try {
     let { TopicId, UserId, from, message, imageUrl, type } = req.body;
+    
+    // Validate required fields
+    if (!TopicId || !UserId || !from || !message) {
+      return errorResponse(res, new Error('Missing required fields: TopicId, UserId, from, and message are required'));
+    }
+    
     const savedMessage = await Message.create({
       TopicId,
       UserId,
@@ -28,7 +34,10 @@ const addMessage = async (req, res) => {
       imageUrl,
       type,
     });
+    
+    // Find the topic with the correct TopicId
     const topic = await Topic.findOne({
+      where: { id: TopicId },
       include: [
         {
           model: Chat,
@@ -37,23 +46,35 @@ const addMessage = async (req, res) => {
       ],
     });
 
-    req.io.emit("receiveMessage", savedMessage);
-    if (from == "user") {
-      await sendFCMNotification({
-        title: `${topic.Chat.User.name}`,
-        body: message,
-        token: topic.Chat.Shop.User.token,
-      });
-    } else {
-      await sendFCMNotification({
-        title: `${topic.Chat.Shop.name}`,
-        body: message,
-        token: topic.Chat.User.token,
-      });
+    if (req.io) {
+      req.io.emit("receiveMessage", savedMessage);
     }
+    
+    // Send FCM notifications only if we have the topic and valid tokens
+    if (topic && topic.Chat) {
+      try {
+        if (from == "user" && topic.Chat.Shop.User.token) {
+          await sendFCMNotification({
+            title: `${topic.Chat.User.name}`,
+            body: message,
+            token: topic.Chat.Shop.User.token,
+          });
+        } else if (from == "shop" && topic.Chat.User.token) {
+          await sendFCMNotification({
+            title: `${topic.Chat.Shop.name}`,
+            body: message,
+            token: topic.Chat.User.token,
+          });
+        }
+      } catch (notificationError) {
+        console.log('FCM notification failed:', notificationError);
+        // Don't fail the message sending if notification fails
+      }
+    }
+    
     successResponse(res, savedMessage);
   } catch (error) {
-    console.log(error);
+    console.log('Error in addMessage:', error);
     errorResponse(res, error);
   }
 };

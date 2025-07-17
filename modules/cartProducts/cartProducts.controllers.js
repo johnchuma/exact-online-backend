@@ -1,5 +1,17 @@
 const { Op } = require("sequelize");
-const { CartProduct, User,Product,Order,ProductImage, ProductStat, ProductReview,Shop,Favorite } = require("../../models");
+const {
+  CartProduct,
+  User,
+  Product,
+  Order,
+  ProductImage,
+  ProductStat,
+  ProductReview,
+  Shop,
+  Favorite,
+  Service,
+  ServiceImage,
+} = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 
@@ -19,6 +31,23 @@ const findCartProductByID = async (id) => {
 const addCartProduct = async (req, res) => {
   try {
     let { UserId, ProductId } = req.body;
+
+    // Check if product is already in cart
+    const existingCartItem = await CartProduct.findOne({
+      where: {
+        UserId,
+        ProductId,
+      },
+    });
+
+    if (existingCartItem) {
+      return errorResponse(
+        res,
+        { message: "Product is already in your cart" },
+        409
+      );
+    }
+
     const response = await CartProduct.create({
       UserId,
       ProductId,
@@ -31,19 +60,20 @@ const addCartProduct = async (req, res) => {
 };
 const getUserCartProducts = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const response = await CartProduct.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where:{
-         UserId:id
+      where: {
+        UserId: id,
       },
-      include: [{
-        model:Product,
-        required:true,
-        include:[ProductImage,Shop]
-
-      }],
+      include: [
+        {
+          model: Product,
+          required: true,
+          include: [ProductImage, Shop],
+        },
+      ],
     });
     successResponse(res, {
       count: response.count,
@@ -54,8 +84,6 @@ const getUserCartProducts = async (req, res) => {
     errorResponse(res, error);
   }
 };
-
-
 
 const getCartProduct = async (req, res) => {
   try {

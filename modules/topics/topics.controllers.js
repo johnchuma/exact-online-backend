@@ -31,26 +31,28 @@ const findTopicByID = async (id) => {
 const addTopic = async (req, res) => {
   try {
     let { ChatId, OrderId, ProductId, ServiceId } = req.body;
-    let options;
-    if (OrderId) {
-      options = {
-        ChatId,
-        OrderId,
-      };
-    } else if (ServiceId) {
-      options = {
-        ChatId,
-        ServiceId,
-      };
-    } else {
-      options = {
-        ChatId,
-        ProductId,
-      };
+    
+    // Validate that ChatId is provided
+    if (!ChatId) {
+      return errorResponse(res, new Error('ChatId is required'));
     }
+    
+    let options = { ChatId };
+    
+    // Add specific identifiers if provided
+    if (OrderId) {
+      options.OrderId = OrderId;
+    } else if (ServiceId) {
+      options.ServiceId = ServiceId;
+    } else if (ProductId) {
+      options.ProductId = ProductId;
+    }
+    // If none of the above, it's a general conversation topic
+    
     let topic = await Topic.findOne({
       where: options,
     });
+    
     if (!topic) {
       topic = await Topic.create({
         ChatId,
@@ -59,14 +61,16 @@ const addTopic = async (req, res) => {
         ServiceId,
       });
     }
+    
     topic = await Topic.findOne({
-      where: options,
+      where: { id: topic.id },
       include: [
         {
           model: Chat,
         },
       ],
     });
+    
     successResponse(res, topic);
   } catch (error) {
     console.log(error);
