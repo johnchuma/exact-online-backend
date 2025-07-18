@@ -4,6 +4,7 @@ const http = require("http");
 const bodyParser = require("body-parser");
 const app = express();
 const fs = require("fs");
+const redisClient = require("./config/redis");
 const { Server } = require("socket.io");
 const AdDimensionsRoutes = require("./modules/adDimensions/adDimensions.routes");
 const AdsRoutes = require("./modules/ads/ads.routes");
@@ -137,13 +138,13 @@ app.use(
   CategoryProductSpecificationsRoutes
 );
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
   try {
-    res.status(200).send("Server is running fine")
+    res.status(200).send("Server is running fine");
   } catch (error) {
-    res.status(500).send("Server is not running")
+    res.status(500).send("Server is not running");
   }
-})
+});
 app.get("/scrap", scrapeResults);
 app.get("/open-app", (req, res) => {
   try {
@@ -155,13 +156,19 @@ app.get("/open-app", (req, res) => {
   }
 });
 
-app.get("/fcm",async(req,res)=>{
-var token = "er5-Sh1JQZu0rjM3dGDSCj:APA91bF9a3Wt3V8IKQScdw1OGJfi48ypJl_R0qr7Flb07pCWK90bMhnsu2e2JIh1OMcYyvKo0eRNn6a48AIZ7DcT3OHeHoK2_9G1z2TiZMzQEYLFpZw0DhI"
-var title = "testing deeplink";
-var body = "This is working fine";
-const response = await sendFCMNotification({title:title,body:body,token:token,data:{key:"here is the key"}})
- res.status(200).send({status:true,response})
-})
+app.get("/fcm", async (req, res) => {
+  var token =
+    "er5-Sh1JQZu0rjM3dGDSCj:APA91bF9a3Wt3V8IKQScdw1OGJfi48ypJl_R0qr7Flb07pCWK90bMhnsu2e2JIh1OMcYyvKo0eRNn6a48AIZ7DcT3OHeHoK2_9G1z2TiZMzQEYLFpZw0DhI";
+  var title = "testing deeplink";
+  var body = "This is working fine";
+  const response = await sendFCMNotification({
+    title: title,
+    body: body,
+    token: token,
+    data: { key: "here is the key" },
+  });
+  res.status(200).send({ status: true, response });
+});
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -171,7 +178,17 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(5000, () => {
-  logger.info("Server is started at port 5000")
+server.listen(5000, async () => {
+  // Initialize Redis connection
+  try {
+    await redisClient.connect();
+    logger.info("Redis connected successfully");
+  } catch (error) {
+    logger.warn("Failed to connect to Redis, continuing without cache", {
+      error: error.message,
+    });
+  }
+
+  logger.info("Server is started at port 5000");
   console.log("Server started at port 5000");
 });

@@ -17,6 +17,7 @@ const { getUrl } = require("../../utils/get_url");
 const moment = require("moment");
 const logger = require("../../utils/logger");
 const { v4: uuidv4 } = require("uuid"); // For requestId
+const { invalidateProductCaches } = require("../../utils/cache");
 
 const childLogger = logger.child({ module: "Products Module" });
 
@@ -119,6 +120,9 @@ const addProduct = async (req, res) => {
       CategoryId,
       ShopId,
     });
+
+    // Invalidate relevant caches
+    await invalidateProductCaches(response.id, ShopId, CategoryId);
 
     childLogger.info("Product added successfully", {
       requestId,
@@ -612,6 +616,9 @@ const updateProduct = async (req, res) => {
       ...req.body,
     });
 
+    // Invalidate relevant caches
+    await invalidateProductCaches(id, product.ShopId, product.CategoryId);
+
     childLogger.info("Product updated successfully", {
       requestId,
       productId: id,
@@ -654,7 +661,15 @@ const deleteProduct = async (req, res) => {
     }
 
     childLogger.info("Deleting product", { requestId, productId: id });
+
+    // Store values before deletion for cache invalidation
+    const shopId = product.ShopId;
+    const categoryId = product.CategoryId;
+
     const response = await product.destroy();
+
+    // Invalidate relevant caches
+    await invalidateProductCaches(id, shopId, categoryId);
 
     childLogger.info("Product deleted successfully", {
       requestId,

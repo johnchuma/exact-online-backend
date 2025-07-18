@@ -7,6 +7,7 @@ const {
   User,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
+const { invalidateServiceCaches } = require("../../utils/cache");
 
 const findServiceByID = async (id) => {
   try {
@@ -34,6 +35,10 @@ const addService = async (req, res) => {
       CategoryId,
       ShopId,
     });
+
+    // Invalidate relevant caches
+    await invalidateServiceCaches(response.id, ShopId, CategoryId);
+
     successResponse(res, response);
   } catch (error) {
     console.log(error);
@@ -256,9 +261,18 @@ const updateService = async (req, res) => {
   try {
     const { id } = req.params;
     const service = await findServiceByID(id);
+
+    // Store values before update for cache invalidation
+    const shopId = service.ShopId;
+    const categoryId = service.CategoryId;
+
     const response = await service.update({
       ...req.body,
     });
+
+    // Invalidate relevant caches
+    await invalidateServiceCaches(id, shopId, categoryId);
+
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
@@ -269,7 +283,16 @@ const deleteService = async (req, res) => {
   try {
     const { id } = req.params;
     const service = await findServiceByID(id);
+
+    // Store values before deletion for cache invalidation
+    const shopId = service.ShopId;
+    const categoryId = service.CategoryId;
+
     const response = await service.destroy();
+
+    // Invalidate relevant caches
+    await invalidateServiceCaches(id, shopId, categoryId);
+
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);

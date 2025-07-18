@@ -6,6 +6,7 @@ const {
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
+const { invalidateCategoryCaches } = require("../../utils/cache");
 
 const findCategoryByID = async (id) => {
   try {
@@ -29,6 +30,10 @@ const addCategory = async (req, res) => {
       type,
       image,
     });
+
+    // Invalidate relevant caches
+    await invalidateCategoryCaches(response.id, type);
+
     successResponse(res, response);
   } catch (error) {
     console.log(error);
@@ -93,6 +98,10 @@ const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await findCategoryByID(id);
+    
+    // Store values before update for cache invalidation
+    const categoryType = category.type;
+    
     const image = await getUrl(req);
     console.log(req.body);
     console.log(image);
@@ -102,6 +111,10 @@ const updateCategory = async (req, res) => {
     const response = await category.update({
       ...req.body,
     });
+
+    // Invalidate relevant caches
+    await invalidateCategoryCaches(id, categoryType);
+
     console.log(req.body);
     successResponse(res, response);
   } catch (error) {
@@ -112,7 +125,15 @@ const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await findCategoryByID(id);
+    
+    // Store values before deletion for cache invalidation
+    const categoryType = category.type;
+    
     const response = await category.destroy();
+
+    // Invalidate relevant caches
+    await invalidateCategoryCaches(id, categoryType);
+
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
