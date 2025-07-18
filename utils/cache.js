@@ -424,7 +424,10 @@ const generateCategoryDetailCacheKey = (categoryId, userId = null) => {
 /**
  * Invalidate cache patterns when categories are modified
  */
-const invalidateCategoryCaches = async (categoryId = null, categoryType = null) => {
+const invalidateCategoryCaches = async (
+  categoryId = null,
+  categoryType = null
+) => {
   try {
     const patterns = [];
 
