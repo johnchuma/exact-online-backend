@@ -138,7 +138,7 @@ const getReel = async (req, res) => {
                   EXISTS (
                     SELECT 1
                     FROM "ShopFollowers"
-                    WHERE "ShopFollowers"."UserId" = ${user.id}
+                    WHERE "ShopFollowers"."UserId" = '${user.id}'
                     AND "ShopFollowers"."ShopId" = "Shop"."id"
                   )
                 `),
@@ -160,7 +160,7 @@ const getReel = async (req, res) => {
                   EXISTS (
                     SELECT 1
                     FROM "ReelStats"
-                    WHERE "ReelStats"."UserId" = ${user.id}
+                    WHERE "ReelStats"."UserId" = '${user.id}'
                     AND "ReelStats"."ReelId" = "Reel"."id"
                     AND "ReelStats"."type" = 'like'
                   )
@@ -269,7 +269,7 @@ const updateReel = async (req, res) => {
 const deleteReel = async (req, res) => {
   try {
     const { id } = req.params;
-    const reel = await findReelByID(id);
+    const reel = await Reel.findByPk(id);
     const response = await reel.destroy();
     successResponse(res, response);
   } catch (error) {
