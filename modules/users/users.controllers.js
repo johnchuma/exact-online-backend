@@ -247,36 +247,19 @@ const sendVerificationCode = async (req, res) => {
 const login = async (req, res) => {
   const requestId = uuidv4();
   try {
-    childLogger.http("Received login request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      body: { email: req.body.email }, // Avoid logging password
-    });
+    
 
     const { email, password } = req.body;
-    childLogger.debug("Request body", { requestId, email });
-
-    childLogger.info("Finding user by email", { requestId, email });
     const user = await User.findOne({
       where: { email },
     });
 
     if (user) {
-      childLogger.info("User found", { requestId, userId: user.id, email });
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
-        childLogger.info("Password verified, generating JWT", {
-          requestId,
-          userId: user.id,
-        });
+       
         const token = generateJwtTokens(user);
 
-        childLogger.info("Login successful", {
-          requestId,
-          userId: user.id,
-          email,
-        });
         successResponse(res, token);
       } else {
         childLogger.warn("Incorrect password", { requestId, email });
