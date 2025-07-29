@@ -77,13 +77,6 @@ const findProductByID = async (id) => {
 const addProduct = async (req, res) => {
   const requestId = uuidv4();
   try {
-    childLogger.http("Received add product request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      body: req.body,
-    });
-
     const {
       name,
       sellingPrice,
@@ -95,18 +88,10 @@ const addProduct = async (req, res) => {
       specifications,
       description,
       CategoryId,
+      SubcategoryId,
       ShopId,
     } = req.body;
-    childLogger.debug("Request body", { requestId, body: req.body });
 
-    childLogger.info("Creating new product", {
-      requestId,
-      name,
-      CategoryId,
-      ShopId,
-      isHidden,
-      isNegotiable,
-    });
     const response = await Product.create({
       name,
       sellingPrice: `${sellingPrice}`.replace(",", ""),
@@ -118,6 +103,7 @@ const addProduct = async (req, res) => {
       specifications,
       description,
       CategoryId,
+      SubcategoryId,
       ShopId,
     });
 

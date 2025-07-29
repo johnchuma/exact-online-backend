@@ -9,16 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Product.belongsTo(models.Shop)
-      Product.hasMany(models.Favorite)
-      Product.hasMany(models.OrderedProduct,{
-        onDelete:"CASCADE",
-        scope:true
-      })
-      Product.hasMany(models.CartProduct,{
-        onDelete:"CASCADE",
-        scope:true
-      })
+      Product.belongsTo(models.Shop);
+      Product.hasMany(models.Favorite);
+      Product.hasMany(models.OrderedProduct, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
+      Product.hasMany(models.CartProduct, {
+        onDelete: "CASCADE",
+        scope: true,
+      });
       Product.hasMany(models.PromotedProduct, {
         onDelete: "CASCADE",
         scope: true,
@@ -43,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         scope: true,
       });
+      Product.belongsTo(models.Category, {
+        foreignKey: "CategoryId",
+        as: "category",
+      });
+      Product.belongsTo(models.Subcategory, );
     }
   }
   Product.init(
@@ -56,6 +61,10 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      SubcategoryId: {
+        type: DataTypes.UUID,
+        allowNull: true,
       },
       sellingPrice: {
         type: DataTypes.DOUBLE,
@@ -77,9 +86,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
-      isNegotiable:{
+      isNegotiable: {
         type: DataTypes.BOOLEAN,
-        defaultValue:true,
+        defaultValue: true,
       },
       ShopId: {
         type: DataTypes.UUID,

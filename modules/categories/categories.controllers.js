@@ -3,6 +3,7 @@ const {
   Category,
   CategoryProductSpecification,
   Product,
+  Subcategory,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
@@ -57,22 +58,38 @@ const getCategories = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: options,
-      attributes: [
-        "id",
-        "name",
-        "type",
-        "image",
-        "createdAt",
-        "updatedAt",
-        [
-          Sequelize.literal(`(
+      include: [
+        {
+          model: CategoryProductSpecification,
+        },
+        {
+          model: Subcategory,
+          attributes: {
+            include: [
+              [
+                Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM "Products"
+            WHERE "Products"."SubcategoryId" = "Subcategories"."id"
+          )`),
+                "productsCount",
+              ],
+            ],
+          },
+        },
+      ],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
             SELECT COUNT(*)
             FROM "Products"
             WHERE "Products"."CategoryId" = "Category"."id"
           )`),
-          "productsCount",
+            "productsCount",
+          ],
         ],
-      ],
+      },
       order: [["createdAt", "DESC"]],
     });
 
@@ -98,10 +115,10 @@ const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await findCategoryByID(id);
-    
+
     // Store values before update for cache invalidation
     const categoryType = category.type;
-    
+
     const image = await getUrl(req);
     console.log(req.body);
     console.log(image);
@@ -125,10 +142,10 @@ const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await findCategoryByID(id);
-    
+
     // Store values before deletion for cache invalidation
     const categoryType = category.type;
-    
+
     const response = await category.destroy();
 
     // Invalidate relevant caches

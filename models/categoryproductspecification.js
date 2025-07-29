@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      CategoryProductSpecification.belongsTo(models.Category)
+      CategoryProductSpecification.belongsTo(models.Category);
     }
   }
   CategoryProductSpecification.init(
@@ -25,8 +25,21 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       expectedDataType: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM("string", "number", "boolean", "date"),
         defaultValue: "string",
+      },
+      inputStyle: {
+        type: DataTypes.ENUM(
+          "single-select",
+          "multi-select",
+          "toggle",
+          "range"
+        ),
+        defaultValue: "single-select",
+      },
+      values: {
+        type: DataTypes.JSON,
+        allowNull: true,
       },
       CategoryId: {
         type: DataTypes.UUID,

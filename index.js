@@ -37,6 +37,7 @@ const ShopFollowersRoutes = require("./modules/shopFollowers/shopFollowers.route
 const OrdersRoutes = require("./modules/orders/orders.routes");
 const ServicesRoutes = require("./modules/services/services.routes");
 const ServiceImagesRoutes = require("./modules/serviceImages/serviceImages.routes");
+const SubCategoriesRoutes = require("./modules/subCategories/subCategories.routes");
 const OrderedProductsRoutes = require("./modules/orderedProducts/orderedProducts.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
@@ -72,6 +73,7 @@ const {
   topicsTag,
   servicesTag,
   serviceImagesTag,
+  subCategoriesTag,
 } = require("./utils/apiSwaggerTags");
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -101,6 +103,7 @@ app.use("/ads", adsTag, AdsRoutes);
 app.use("/categories", categoriesTag, CategoriesRoutes);
 app.use("/products", productsTag, ProductsRoutes);
 app.use("/services", servicesTag, ServicesRoutes);
+app.use("/sub-categories", subCategoriesTag, SubCategoriesRoutes);
 app.use("/chats", chatsTag, ChatsRoutes);
 app.use("/topics", topicsTag, TopicsRoutes);
 app.use("/messages", messagesTag, MessagesRoutes);

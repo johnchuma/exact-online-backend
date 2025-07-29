@@ -18,11 +18,13 @@ const findCategoryProductSpecificationByID = async (id) => {
 };
 const addCategoryProductSpecification = async (req, res) => {
   try {
-    let { label, expectedDataType, CategoryId } = req.body;
+    let { label, expectedDataType, CategoryId, inputStyle,values } = req.body;
     const response = await CategoryProductSpecification.create({
       label,
       expectedDataType,
       CategoryId,
+      inputStyle,
+      values
     });
     successResponse(res, response);
   } catch (error) {
@@ -32,7 +34,7 @@ const addCategoryProductSpecification = async (req, res) => {
 };
 const getCategoryProductSpecifications = async (req, res) => {
   try {
-    const {id} = req.params
+    const { id } = req.params;
     const response = await CategoryProductSpecification.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
@@ -40,7 +42,7 @@ const getCategoryProductSpecifications = async (req, res) => {
         label: {
           [Op.like]: `%${req.keyword}%`,
         },
-        CategoryId:id
+        CategoryId: id,
       },
     });
     successResponse(res, {

@@ -2,33 +2,16 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable("CategoryProductSpecifications", {
+    await queryInterface.createTable("Subcategories", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      label: {
+       name: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      expectedDataType: {
-        type: DataTypes.ENUM("string", "number", "boolean", "date"),
-        defaultValue: "string",
-      },
-      inputStyle: {
-        type: DataTypes.ENUM(
-          "single-select",
-          "multi-select",
-          "toggle",
-          "range"
-        ),
-        defaultValue: "single-select",
-      },
-      values: {
-        type: DataTypes.JSON,
-        allowNull: true,
       },
       CategoryId: {
         type: DataTypes.UUID,
@@ -38,6 +21,7 @@ module.exports = {
         allowNull: false,
         type: DataTypes.DATE,
       },
+     
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
@@ -45,6 +29,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable("CategoryProductSpecifications");
+    await queryInterface.dropTable("Subcategories");
   },
 };
