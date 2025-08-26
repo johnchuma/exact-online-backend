@@ -35,6 +35,7 @@ const getReels = async (req, res) => {
     const response = await Reel.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
+      order: [["createdAt", "DESC"]],
       where: {
         caption: {
           [Op.like]: `%${req.keyword}%`,
@@ -205,7 +206,7 @@ const getReel = async (req, res) => {
                   EXISTS (
                     SELECT 1
                     FROM "ShopFollowers"
-                    WHERE "ShopFollowers"."UserId" = ${user.id}
+                    WHERE "ShopFollowers"."UserId" = '${user.id}'
                     AND "ShopFollowers"."ShopId" = "Shop"."id"
                   )
                 `),
@@ -227,7 +228,7 @@ const getReel = async (req, res) => {
                   EXISTS (
                     SELECT 1
                     FROM "ReelStats"
-                    WHERE "ReelStats"."UserId" = ${user.id}
+                    WHERE "ReelStats"."UserId" = '${user.id}'
                     AND "ReelStats"."ReelId" = "Reel"."id"
                     AND "ReelStats"."type" = 'like'
                   )

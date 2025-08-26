@@ -58,7 +58,11 @@ const getUserFavorites = async (req, res) => {
       include:[{
         model:Product,
         required:true,
-        include: [ProductImage, ProductStat, ProductReview]
+        include: [ProductImage, ProductStat, ProductReview,{
+        model: Favorite,
+        where: { UserId: req.user.id },
+        required: false,
+      }]
       }]
     });
     successResponse(res, {

@@ -86,6 +86,50 @@ const getTopics = async (req, res) => {
       order: [[Sequelize.col('"lastMessageDatetime"'), "DESC", "NULLS LAST"]],
       where: {
         ChatId: id,
+        [Op.or]: [
+          // General conversation topics (no specific ProductId, ServiceId, or OrderId)
+          {
+            ProductId: null,
+            ServiceId: null,
+            OrderId: null,
+          },
+          // Topics with ProductId that have existing Product
+          {
+            ProductId: {
+              [Op.ne]: null,
+            },
+            [Op.and]: Sequelize.literal(`
+              EXISTS (
+                SELECT 1 FROM "Products" 
+                WHERE "Products"."id" = "Topic"."ProductId"
+              )
+            `),
+          },
+          // Topics with ServiceId that have existing Service
+          {
+            ServiceId: {
+              [Op.ne]: null,
+            },
+            [Op.and]: Sequelize.literal(`
+              EXISTS (
+                SELECT 1 FROM "Services" 
+                WHERE "Services"."id" = "Topic"."ServiceId"
+              )
+            `),
+          },
+          // Topics with OrderId that have existing Order
+          {
+            OrderId: {
+              [Op.ne]: null,
+            },
+            [Op.and]: Sequelize.literal(`
+              EXISTS (
+                SELECT 1 FROM "Orders" 
+                WHERE "Orders"."id" = "Topic"."OrderId"
+              )
+            `),
+          },
+        ],
       },
       attributes: {
         include: [
@@ -114,23 +158,38 @@ const getTopics = async (req, res) => {
       include: [
         {
           model: Order,
+          required: false,
           include: [
             {
               model: OrderedProduct,
+              required: false,
               include: {
                 model: Product,
                 include: [ProductImage],
+                required: false,
               },
             },
           ],
         },
         {
           model: Product,
-          include: [ProductImage],
+          required: false,
+          include: [
+            {
+              model: ProductImage,
+              required: false,
+            },
+          ],
         },
         {
           model: Service,
-          include: [ServiceImage],
+          required: false,
+          include: [
+            {
+              model: ServiceImage,
+              required: false,
+            },
+          ],
         },
         {
           model: Message,
@@ -140,10 +199,11 @@ const getTopics = async (req, res) => {
         },
       ],
     });
+    
     successResponse(res, {
       count: response.count,
       page: req.page,
-      rows: response.rows, // Explicitly include rows instead of spreading entire response
+      rows: response.rows,
     });
   } catch (error) {
     errorResponse(res, error);
