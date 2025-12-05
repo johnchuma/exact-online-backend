@@ -268,25 +268,14 @@ const getNewArrivalProducts = async (req, res) => {
       include: includes,
     });
 
-    childLogger.info("New arrival products fetched successfully", {
-      requestId,
-      count: response.count,
-      page: req.page,
-    });
+  
     successResponse(res, {
       count: response.count,
       page: req.page,
       ...response,
     });
   } catch (error) {
-    childLogger.error("Failed to fetch new arrival products", {
-      requestId,
-      keyword: req.keyword,
-      limit: req.limit,
-      offset: req.offset,
-      error: error.message,
-      stack: error.stack,
-    });
+  
     errorResponse(res, error);
   }
 };

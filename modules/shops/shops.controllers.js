@@ -13,6 +13,7 @@ const { getUrl } = require("../../utils/get_url");
 const { Fn } = require("sequelize/lib/utils");
 const moment = require("moment");
 const { subscribe } = require("./shops.routes");
+const sendSMS = require("../../utils/send_sms");
 
 const findShopByID = async (id) => {
   try {
@@ -40,6 +41,26 @@ const addShop = async (req, res) => {
       description,
       UserId: UserId,
     });
+    //find first subscription and add it to shop
+    const subscription = await Subscription.findOne({
+      where: {
+        id: {
+          [Op.ne]: 0,
+        },
+      },
+    });
+    await ShopSubscription.create({
+      ShopId: response.id,
+      SubscriptionId: subscription.id,
+    });
+     await sendSMS(
+            "0715800430",
+            `Hello Admin,\n A new shop has been created with name: ${response.name} and needs verificaion to proceed, please help. \n\nThank you`
+          );
+      await sendSMS(
+            "0677975251",
+            `Hello Admin,\n A new shop has been created with name: ${response.name} and needs verificaion to proceed, please help. \n\nThank you`
+          );
     successResponse(res, response);
   } catch (error) {
     console.log(error);

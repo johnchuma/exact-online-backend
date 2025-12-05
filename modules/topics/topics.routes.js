@@ -12,7 +12,7 @@ const { getPagination } = require("../../utils/getPagination");
 const router = Router();
 
 router.post("/", validateJWT, addTopic);
-router.get("/chat/:id", validateJWT, getPagination, getTopics);
+router.get("/chat/:id", getPagination, getTopics);
 router.get("/:id", validateJWT, getTopic);
 router.patch("/:id", validateJWT, updateTopic);
 router.delete("/:id", validateJWT, deleteTopic);
