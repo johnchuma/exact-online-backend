@@ -47,7 +47,23 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "CategoryId",
         as: "category",
       });
-      Product.belongsTo(models.Subcategory, );
+      Product.belongsTo(models.Subcategory);
+      Product.hasOne(models.InventorySettings, {
+        foreignKey: "ProductId",
+        as: "inventorySettings",
+      });
+      Product.hasMany(models.InventoryTransaction, {
+        foreignKey: "ProductId",
+        as: "inventoryTransactions",
+      });
+      Product.hasMany(models.InventoryBatch, {
+        foreignKey: "ProductId",
+        as: "inventoryBatches",
+      });
+      Product.hasMany(models.InventoryAlert, {
+        foreignKey: "ProductId",
+        as: "inventoryAlerts",
+      });
     }
   }
   Product.init(
@@ -105,6 +121,11 @@ module.exports = (sequelize, DataTypes) => {
       description: {
         type: DataTypes.TEXT,
         allowNull: true,
+      },
+      productQuantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
     },
     {
