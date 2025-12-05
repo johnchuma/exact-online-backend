@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: "NEW ORDER",  //NEW ORDER, IN PROGRESS, CONFIRMED ORDERS
       },
+      otp: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
     },
     {
       sequelize,

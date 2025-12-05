@@ -6,12 +6,14 @@ const {
   Order,
   Product,
   ProductImage,
+  Notification
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { getUserChats } = require("../chats/chats.controllers");
 const sendSMS = require("../../utils/send_sms");
 const { sendFCMNotification } = require("../../utils/send_notification");
+const { randomNumber } = require("../../utils/random_number");
 
 const findOrderByID = async (id) => {
   try {
@@ -65,6 +67,11 @@ const addOrder = async (req, res) => {
       body: `${from.name} has just placed an order.`,
       token: shop.User.token,
       data: { type: "order", orderId: response.id, to: "shop" },
+    });
+    await Notification.create({
+      title: "You have a new order",
+      message: `You have a new order from ${from.name}.`,
+      userId: shop.User.id,
     });
     await sendSMS(
       shop.phone,
@@ -220,7 +227,13 @@ const updateOrder = async (req, res) => {
         token: order.Shop.User.token,
         data: { type: "order", orderId: order.id, to: "shop" },
       });
+      await Notification.create({
+        title: "Order price confirmed",
+        message: `${order.User.name} has just confirmed the price after negotiation.`,
+        userId: order.Shop.User.id,
+      });
     }
+
     if (payload.status == "CONFIRMED") {
       await sendFCMNotification({
         title: `Seller has confirmed the order`,
@@ -228,13 +241,24 @@ const updateOrder = async (req, res) => {
         token: order.User.token,
         data: { type: "order", orderId: order.id, to: "user" },
       });
+      await Notification.create({
+        title: "Order confirmed",
+        message: `${order.Shop.name} seller has just confirmed your order.`,
+        userId: order.User.id,
+      });
     }
+   
     if (payload.status == "CANCELED") {
       await sendFCMNotification({
         title: `Order cancellation`,
         body: `${user.name} has just canceled an order`,
         token: user.token,
         data: { type: "order", orderId: order.id, to: "shop" },
+      });
+      await Notification.create({
+        title: "Order canceled",
+        message: `${user.name} has just canceled an order.`,
+        userId: order.Shop.User.id,
       });
     }
     if (payload.status == "DELIVERED") {
@@ -244,14 +268,38 @@ const updateOrder = async (req, res) => {
         token: order.User.token,
         data: { type: "order", orderId: order.id, to: "user" },
       });
+      await Notification.create({
+        title: "Order delivered",
+        message: `Your order is marked as delivered.`,
+        userId: order.User.id,
+      });
+      const code = randomNumber(6);
+      await order.update({ otp: code });
+      await sendSMS(
+        order.User.phone,
+        `Dear ${order.User.name},\nYour order from ${order.Shop.name} has been marked as delivered. Please use the OTP code ${code} to confirm delivery of your order.\n\nThank you.`
+      ); 
     }
     if (payload.status == "CLOSED") {
-      await sendFCMNotification({
+      //confirm otp
+      if (payload.otp !== order.otp) {
+        res.status(401).send({status:false, message: "Invalid OTP" });
+      }else{
+        
+       await sendFCMNotification({
         title: `Customer confirmed delivery`,
         body: `Customer has just confirmed that they got their order`,
         token: order.Shop.User.token,
         data: { type: "order", orderId: order.id, to: "shop" },
       });
+      await Notification.create({
+        title: "Order closed",
+        message: `Customer has just confirmed that they got their order.`,
+        userId: order.Shop.User.id,
+      });
+      await order.update({ otp: null }); //clear otp
+      }
+      
     }
     const response = await order.update(payload);
     successResponse(res, response);

@@ -11,6 +11,7 @@ const {
   User,
   Order,
   Shop,
+  CategoryProductSpecification,
 } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
@@ -20,6 +21,57 @@ const { v4: uuidv4 } = require("uuid"); // For requestId
 const { invalidateProductCaches } = require("../../utils/cache");
 
 const childLogger = logger.child({ module: "Products Module" });
+
+// Helper function to add specification filters to query
+const addSpecificationFilters = (filter, query) => {
+  const specificationFilters = {};
+  Object.keys(query).forEach(key => {
+    if (key.startsWith('spec_')) {
+      const specLabel = key.substring(5).replace(/_/g, ' '); // Remove 'spec_' prefix and convert underscores to spaces
+      const specValue = query[key];
+      if (specValue && specValue.toLowerCase() !== 'all') {
+        specificationFilters[specLabel] = specValue;
+      }
+    }
+  });
+  
+  // Add JSON-based specification filters to the where clause
+  Object.keys(specificationFilters).forEach(specLabel => {
+    const specValue = specificationFilters[specLabel];
+    // Use PostgreSQL JSON operators for filtering
+    if (specValue === 'true' || specValue === 'false') {
+      // Boolean values
+      filter[Op.and] = filter[Op.and] || [];
+      filter[Op.and].push(
+        Sequelize.where(
+          Sequelize.fn('CAST', Sequelize.literal(`"specifications"->>'${specLabel}' AS BOOLEAN`)),
+          specValue === 'true'
+        )
+      );
+    } else if (!isNaN(specValue) && specValue !== '') {
+      // Numeric values
+      filter[Op.and] = filter[Op.and] || [];
+      filter[Op.and].push(
+        Sequelize.where(
+          Sequelize.fn('CAST', Sequelize.literal(`"specifications"->>'${specLabel}'`), 'FLOAT'),
+          parseFloat(specValue)
+        )
+      );
+    } else {
+      // String values - use case-insensitive search
+      filter[Op.and] = filter[Op.and] || [];
+      filter[Op.and].push(
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.literal(`"specifications"->>'${specLabel}'`)),
+          'LIKE',
+          `%${specValue.toLowerCase()}%`
+        )
+      );
+    }
+  });
+  
+  return filter;
+};
 
 const findProductByID = async (id) => {
   const requestId = uuidv4();
@@ -88,10 +140,10 @@ const addProduct = async (req, res) => {
       specifications,
       description,
       CategoryId,
-      SubcategoryId,
+      // SubcategoryId,
       ShopId,
     } = req.body;
-
+  console.log("Adding product:", req.body);
     const response = await Product.create({
       name,
       sellingPrice: `${sellingPrice}`.replace(",", ""),
@@ -103,10 +155,10 @@ const addProduct = async (req, res) => {
       specifications,
       description,
       CategoryId,
-      SubcategoryId,
+      // SubcategoryId,
       ShopId,
     });
-
+     console.log("product added",response)
     // Invalidate relevant caches
     await invalidateProductCaches(response.id, ShopId, CategoryId);
 
@@ -119,14 +171,7 @@ const addProduct = async (req, res) => {
     });
     successResponse(res, response);
   } catch (error) {
-    childLogger.error("Failed to create product", {
-      requestId,
-      name: req.body.name,
-      CategoryId: req.body.CategoryId,
-      ShopId: req.body.ShopId,
-      error: error.message,
-      stack: error.stack,
-    });
+    console.error("Error adding product:", error);
     errorResponse(res, error);
   }
 };
@@ -143,18 +188,27 @@ const addProduct = async (req, res) => {
  *         name: category
  *         schema:
  *           type: string
+ *         description: Filter by category ID or subcategory ID
  *       - in: query
  *         name: keyword
  *         schema:
  *           type: string
+ *         description: Search keyword for product names
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *         description: Number of products to return
  *       - in: query
  *         name: offset
  *         schema:
  *           type: integer
+ *         description: Number of products to skip
+ *       - in: query
+ *         name: spec_{specificationLabel}
+ *         schema:
+ *           type: string
+ *         description: Filter by product specifications. Use spec_ prefix followed by the specification label (e.g., spec_Make=Toyota, spec_Body=SUV, spec_Discount=true)
  *     responses:
  *       200:
  *         description: Successfully fetched products
@@ -191,13 +245,23 @@ const getProducts = async (req, res) => {
     });
 
     let filter = {
+      isHidden: false,
       name: {
         [Op.like]: `%${req.keyword ?? ""}%`,
       },
     };
-    if (category && category !== "All") {
-      filter.CategoryId = category;
+    
+    // Support filtering by CategoryId or SubcategoryId
+    if (category && category.toLowerCase() !== "all") {
+      filter[Op.or] = [
+        { CategoryId: category },
+        { SubcategoryId: category },
+      ];
     }
+    
+    // Add specification filters
+    filter = addSpecificationFilters(filter, req.query);
+    
     let includes = [
       ProductImage,
       {
@@ -218,7 +282,10 @@ const getProducts = async (req, res) => {
       limit: req.limit,
       offset: req.offset,
       where: filter,
+      order: [["createdAt", "DESC"]],
       include: includes,
+      distinct: true, // This ensures correct counting with JOINs
+      col: 'id', // Count distinct products, not joined rows
     });
 
     childLogger.info("Products fetched successfully", {
@@ -240,6 +307,7 @@ const getProducts = async (req, res) => {
 const getNewArrivalProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
+    const { category } = req.query;
     let includes = [
       ProductImage,
       {
@@ -256,16 +324,32 @@ const getNewArrivalProducts = async (req, res) => {
         required: false,
       });
     }
+    
+    let filter = {
+      isHidden: false,
+      name: {
+        [Op.like]: `%${req.keyword}%`,
+      },
+    };
+    // Support filtering by CategoryId or SubcategoryId
+    if (category && category.toLowerCase() !== "all") {
+      filter[Op.or] = [
+        { CategoryId: category },
+        { SubcategoryId: category },
+      ];
+    }
+    
+    // Add specification filters
+    filter = addSpecificationFilters(filter, req.query);
+    
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
+      where: filter,
       order: [["createdAt", "DESC"]],
       include: includes,
+      distinct: true,
+      col: 'id',
     });
 
   
@@ -284,20 +368,38 @@ const getProductSearch = async (req, res) => {
   const requestId = uuidv4();
   try {
     const { keyword } = req.params;
-    childLogger.http("Received product search request", {
-      requestId,
-      method: req.method,
-      url: req.url,
-      params: { keyword },
-    });
-
-    childLogger.info("Searching products", { requestId, keyword });
-    const response = await Product.findAll({
-      where: {
-        name: {
-          [Op.iLike]: `%${keyword}%`,
-        },
+    const { category } = req.query;
+   
+    
+    let filter = {
+      isHidden: false,
+      name: {
+        [Op.iLike]: `%${keyword}%`,
       },
+    };
+    // Support filtering by CategoryId or SubcategoryId
+    if (category && category.toLowerCase() !== "all") {
+      filter[Op.or] = [
+        { CategoryId: category },
+        { SubcategoryId: category },
+      ];
+    }
+    
+    // Add specification filters
+    filter = addSpecificationFilters(filter, req.query);
+    
+    const response = await Product.findAll({
+      where: filter,
+      include: [
+         ProductImage,
+      {
+        model: Shop,
+        required: true,
+      },
+      // ProductStat,
+      ProductReview,
+
+      ],
     });
 
     childLogger.info("Product search completed", {
@@ -320,6 +422,7 @@ const getProductSearch = async (req, res) => {
 const getProductsForYou = async (req, res) => {
   const requestId = uuidv4();
   try {
+    const { category } = req.query;
     let includes = [
       ProductImage,
       {
@@ -336,15 +439,31 @@ const getProductsForYou = async (req, res) => {
         required: false,
       });
     }
+    
+    let filter = {
+      isHidden: false,
+      name: {
+        [Op.like]: `%${req.keyword}%`,
+      },
+    };
+    // Support filtering by CategoryId or SubcategoryId
+    if (category && category.toLowerCase() !== "all") {
+      filter[Op.or] = [
+        { CategoryId: category },
+        { SubcategoryId: category },
+      ];
+    }
+    
+    // Add specification filters
+    filter = addSpecificationFilters(filter, req.query);
+    
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-      },
+      where: filter,
       include: includes,
+      distinct: true,
+      col: 'id',
     });
 
     successResponse(res, {
@@ -361,11 +480,11 @@ const getShopProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
     const { id } = req.params;
+    const { category } = req.query;
     let includes = [
       ProductImage,
       {
         model: Shop,
-        required: true,
       },
       ProductStat,
       ProductReview,
@@ -377,16 +496,32 @@ const getShopProducts = async (req, res) => {
         required: false,
       });
     }
+    
+    let filter = {
+      name: {
+        [Op.like]: `%${req.keyword}%`,
+      },
+      ShopId: id,
+    };
+    // Support filtering by CategoryId or SubcategoryId
+    if (category && category.toLowerCase() !== "all") {
+      filter[Op.or] = [
+        { CategoryId: category },
+        { SubcategoryId: category },
+      ];
+    }
+    
+    // Add specification filters
+    filter = addSpecificationFilters(filter, req.query);
+    
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-        ShopId: id,
-      },
+      order: [["createdAt", "DESC"]],
+      where: filter,
       include: includes,
+      distinct: true,
+      col: 'id',
     });
 
     childLogger.info("Shop products fetched successfully", {
@@ -418,6 +553,7 @@ const getRelatedProducts = async (req, res) => {
   const requestId = uuidv4();
   try {
     const { id } = req.params;
+    const { category } = req.query;
 
     const product = await findProductByID(id);
 
@@ -445,17 +581,36 @@ const getRelatedProducts = async (req, res) => {
         required: false,
       });
     }
+    
+    let filter = {
+      isHidden: false,
+      name: {
+        [Op.like]: `%${req.keyword}%`,
+      },
+      id: { [Op.ne]: id },
+    };
+    
+    // If category filter is provided, use it; otherwise use the product's CategoryId for related products
+    if (category && category.toLowerCase() !== "all") {
+      filter[Op.or] = [
+        { CategoryId: category },
+        { SubcategoryId: category },
+      ];
+    } else {
+      // Default behavior: find products with same CategoryId
+      filter.CategoryId = product.CategoryId;
+    }
+    
+    // Add specification filters
+    filter = addSpecificationFilters(filter, req.query);
+    
     const response = await Product.findAndCountAll({
       limit: req.limit,
       offset: req.offset,
-      where: {
-        name: {
-          [Op.like]: `%${req.keyword}%`,
-        },
-        id: { [Op.ne]: id },
-        CategoryId: product.CategoryId,
-      },
+      where: filter,
       include: includes,
+      distinct: true,
+      col: 'id',
     });
 
     childLogger.info("Related products fetched successfully", {
@@ -543,8 +698,10 @@ const getProduct = async (req, res) => {
       where: { id },
       include: includes,
     };
-    const product = await Product.findOne(options);
-
+    let product = await Product.findOne(options);
+    //inside product there is specifications JSON ... reorder specifications to be viceversa (bottom, up)
+  
+    console.log("product", product);
     if (!product) {
       return res.status(404).send({
         status: false,

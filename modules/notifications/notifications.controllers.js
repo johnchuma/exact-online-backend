@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { Notification } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
@@ -34,15 +34,32 @@ const addNotification = async (req, res) => {
 
 const getNotifications = async (req, res) => {
     try {
+      const { id } = req.user;
       const response = await Notification.findAndCountAll({
         limit: req.limit,
         offset: req.offset,
+        where: { userId:id },
+        order: [["createdAt", "DESC"]],
       });
       successResponse(res, {
         count: response.count,
         page: req.page,
         ...response,
       });
+    } catch (error) {
+      errorResponse(res, error);
+    }
+  };
+  const getUnreadNotifications = async (req, res) => {
+    try {
+      const { id } = req.user;
+      const response = await Notification.count({
+    
+        where: { userId:id,isRead:false },
+
+      });
+      successResponse(res, response);
+      
     } catch (error) {
       errorResponse(res, error);
     }
@@ -56,13 +73,17 @@ const getSingleNotification = async (req, res) => {
     errorResponse(res, error);
   }
 };
-const updateNotification = async (req, res) => {
+const updateUnreadNotifications = async (req, res) => {
   try {
-    const { id } = req.params;
-    const notification = await findNotificationByID(id);
-    const response = await notification.update({
-      ...req.body,
+    const { id } = req.user;
+    const notifications = await Notification.findAll({
+      where: { userId: id, isRead: false },
     });
+    const response = await Promise.all(
+      notifications.map((notification) =>
+        notification.update({ isRead: true })
+      )
+    );
     successResponse(res, response);
   } catch (error) {
     errorResponse(res, error);
@@ -85,5 +106,6 @@ module.exports = {
   addNotification,
   deleteNotification,
   getSingleNotification,
-  updateNotification,
+  getUnreadNotifications,
+  updateUnreadNotifications,
 };

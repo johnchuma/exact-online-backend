@@ -14,6 +14,8 @@ const { Fn } = require("sequelize/lib/utils");
 const moment = require("moment");
 const { subscribe } = require("./shops.routes");
 const sendSMS = require("../../utils/send_sms");
+const { randomNumber } = require("../../utils/random_number");
+const addPrefixToPhoneNumber = require("../../utils/add_number_prefix");
 
 const findShopByID = async (id) => {
   try {
@@ -288,7 +290,28 @@ const getShop = async (req, res) => {
     errorResponse(res, error);
   }
 };
+const resetShopPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const shop = await findShopByID(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+   
+    const password = randomNumber();
+    const response = await shop.update({
+      password,
+    });
+   await sendSMS(
+       shop.phone,
+      `Hello ${shop.name},\n Your shop password has been reset to ${password}. Please use this password to log in and consider changing it after logging in for security purposes.\n\nThank you`)
+    successResponse(res, response);
+  } catch (error) {
+    console.log(error)
+    errorResponse(res, error);
+  }
+}
 const updateShop = async (req, res) => {
   try {
     const { id } = req.params;
@@ -327,6 +350,7 @@ module.exports = {
   deleteShop,
   getUserShopFollowings,
   addShop,
+  resetShopPassword,
   getShop,
   getUserShops,
   updateShop,

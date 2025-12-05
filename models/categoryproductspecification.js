@@ -37,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
         ),
         defaultValue: "single-select",
       },
+      order: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       values: {
         type: DataTypes.JSON,
         allowNull: true,

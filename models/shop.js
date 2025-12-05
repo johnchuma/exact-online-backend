@@ -77,6 +77,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },  
       shopLat: {
         type: DataTypes.DOUBLE,
         allowNull: true,

@@ -9,6 +9,10 @@ module.exports = {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
+      userId:{
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
       title: {
         allowNull: false,
         type: DataTypes.STRING
@@ -21,6 +25,10 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      isRead:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

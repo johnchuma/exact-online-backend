@@ -6,14 +6,17 @@ const {
     addNotification,
     updateNotification,
     deleteNotification,
+    updateUnreadNotifications,
+    getUnreadNotifications,
 } = require("./notifications.controllers");
 const { getPagination } = require("../../utils/getPagination");
 const router = Router();
 
 router.post("/", addNotification);
-router.get("/",  getPagination, getNotifications);
+router.get("/",  getPagination,validateJWT, getNotifications);
+router.get("/unread",  getPagination,validateJWT, getUnreadNotifications);
 router.get("/:id", validateJWT, getSingleNotification);
-router.patch("/:id", validateJWT, updateNotification);
+router.patch("/unread", validateJWT, updateUnreadNotifications);
 router.delete("/:id", validateJWT, deleteNotification);
 
 module.exports = router;

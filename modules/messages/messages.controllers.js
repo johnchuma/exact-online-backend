@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Message, Topic, Chat, User, Shop } = require("../../models");
+const { Message,Notification, Topic, Chat, User, Shop } = require("../../models");
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { getUrl } = require("../../utils/get_url");
 const { sendFCMNotification } = require("../../utils/send_notification");
@@ -59,11 +59,22 @@ const addMessage = async (req, res) => {
             body: message,
             token: topic.Chat.Shop.User.token,
           });
+          await Notification.create({
+            title: `New message from ${topic.Chat.User.name}`,
+            message: message,
+            userId: topic.Chat.Shop.User.id,
+          });
+
         } else if (from == "shop" && topic.Chat.User.token) {
           await sendFCMNotification({
             title: `${topic.Chat.Shop.name}`,
             body: message,
             token: topic.Chat.User.token,
+          });
+          await Notification.create({
+            title: `New message from ${topic.Chat.Shop.name}`,
+            message: message,
+            userId: topic.Chat.User.id,
           });
         }
       } catch (notificationError) {

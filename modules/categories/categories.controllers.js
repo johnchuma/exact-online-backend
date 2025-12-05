@@ -61,6 +61,7 @@ const getCategories = async (req, res) => {
       include: [
         {
           model: CategoryProductSpecification,
+          // Ordering will be handled via top-level order clause
         },
         {
           model: Subcategory,
@@ -70,12 +71,24 @@ const getCategories = async (req, res) => {
                 Sequelize.literal(`(
             SELECT COUNT(*)
             FROM "Products"
-            WHERE "Products"."SubcategoryId" = "Subcategories"."id"
+            WHERE "Products"."SubcategoryId" = "Subcategory"."id"
           )`),
                 "productsCount",
               ],
             ],
           },
+          separate: true,
+          order: [
+            [
+              Sequelize.literal(`(
+                SELECT COUNT(*)
+                FROM "Products"
+                WHERE "Products"."SubcategoryId" = "Subcategory"."id"
+              )`),
+              "DESC",
+            ],
+            ["createdAt", "DESC"],
+          ],
         },
       ],
       attributes: {
@@ -90,7 +103,19 @@ const getCategories = async (req, res) => {
           ],
         ],
       },
-      order: [["createdAt", "DESC"]],
+      order: [
+        // Order category product specifications from lowest 'order' value (0 upwards)
+        [CategoryProductSpecification, 'order', 'ASC'],
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM "Products"
+            WHERE "Products"."CategoryId" = "Category"."id"
+          )`),
+          "DESC",
+        ],
+        ["createdAt", "DESC"],
+      ],
     });
 
     successResponse(res, {

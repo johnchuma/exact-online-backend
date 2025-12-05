@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
+    userId:{
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
     title: {
       allowNull: false,
       type: DataTypes.STRING
@@ -28,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
     message: {
       allowNull: false,
       type: DataTypes.TEXT,
+    },
+    isRead:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     image: {
       type: DataTypes.STRING,
