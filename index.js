@@ -39,6 +39,8 @@ const ServicesRoutes = require("./modules/services/services.routes");
 const ServiceImagesRoutes = require("./modules/serviceImages/serviceImages.routes");
 const SubCategoriesRoutes = require("./modules/subCategories/subCategories.routes");
 const OrderedProductsRoutes = require("./modules/orderedProducts/orderedProducts.routes");
+const InventoryRoutes = require("./modules/inventory/inventory.routes");
+const POSRoutes = require("./modules/pos/pos.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
 const {
@@ -127,6 +129,8 @@ app.use("/orders", ordersTag, OrdersRoutes);
 app.use("/cart-products", ordersTag, CartProductsRoutes);
 app.use("/banners", bannersTag, BannerRoutes);
 app.use("/ordered-products", orderedProductsTag, OrderedProductsRoutes);
+app.use("/inventory", InventoryRoutes);
+app.use("/pos", POSRoutes);
 app.use(
   "/shops-subscriptions",
   shopsSubscriptionsTag,

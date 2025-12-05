@@ -66,7 +66,7 @@ const addOrder = async (req, res) => {
       title: "You have a new order",
       body: `${from.name} has just placed an order.`,
       token: shop.User.token,
-      data: { type: "order", orderId: response.id, to: "shop" },
+      data: { type: "order", orderId: String(response.id), to: "shop" },
     });
     await Notification.create({
       title: "You have a new order",
@@ -225,7 +225,7 @@ const updateOrder = async (req, res) => {
         title: `${order.User.name} confirmed the price`,
         body: `${order.User.name} has just confirmed the price after negotiation`,
         token: order.Shop.User.token,
-        data: { type: "order", orderId: order.id, to: "shop" },
+        data: { type: "order", orderId: String(order.id), to: "shop" },
       });
       await Notification.create({
         title: "Order price confirmed",
@@ -239,7 +239,7 @@ const updateOrder = async (req, res) => {
         title: `Seller has confirmed the order`,
         body: `${order.Shop.name} seller has just confirmed your order`,
         token: order.User.token,
-        data: { type: "order", orderId: order.id, to: "user" },
+        data: { type: "order", orderId: String(order.id), to: "user" },
       });
       await Notification.create({
         title: "Order confirmed",
@@ -253,7 +253,7 @@ const updateOrder = async (req, res) => {
         title: `Order cancellation`,
         body: `${user.name} has just canceled an order`,
         token: user.token,
-        data: { type: "order", orderId: order.id, to: "shop" },
+        data: { type: "order", orderId: String(order.id), to: "shop" },
       });
       await Notification.create({
         title: "Order canceled",
@@ -266,7 +266,7 @@ const updateOrder = async (req, res) => {
         title: `Order is delivered successfully`,
         body: `Your order is marked as delivered`,
         token: order.User.token,
-        data: { type: "order", orderId: order.id, to: "user" },
+        data: { type: "order", orderId: String(order.id), to: "user" },
       });
       await Notification.create({
         title: "Order delivered",
@@ -290,7 +290,7 @@ const updateOrder = async (req, res) => {
         title: `Customer confirmed delivery`,
         body: `Customer has just confirmed that they got their order`,
         token: order.Shop.User.token,
-        data: { type: "order", orderId: order.id, to: "shop" },
+        data: { type: "order", orderId: String(order.id), to: "shop" },
       });
       await Notification.create({
         title: "Order closed",
