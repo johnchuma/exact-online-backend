@@ -1,13 +1,16 @@
-const POSSale = require("../../models/possale");
-const POSSaleItem = require("../../models/possaleitem");
-const POSSession = require("../../models/possession");
-const Product = require("../../models/product");
-const ProductImage = require("../../models/productimage");
-const Shop = require("../../models/shop");
-const User = require("../../models/user");
-const InventoryTransaction = require("../../models/inventorytransaction");
-const { Op } = require("sequelize");
-const sequelize = require("../../config/db.config");
+const {
+  POSSale,
+  POSSaleItem,
+  POSSession,
+  Product,
+  ProductImage,
+  Shop,
+  User,
+  InventoryTransaction,
+  sequelize,
+  Sequelize,
+} = require("../../models");
+const { Op } = Sequelize;
 const winston = require("winston");
 
 const logger = winston.createLogger({
